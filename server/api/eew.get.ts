@@ -1,6 +1,6 @@
 import { defineEventHandler, getQuery, createError } from "h3";
 
-interface EewResponse {
+interface EEWResponse {
 	result: {
 		status: string;
 		message: string;
@@ -28,7 +28,7 @@ interface EewResponse {
 	report_id: string;
 }
 
-export default defineEventHandler(async (event): Promise<EewResponse> => {
+export default defineEventHandler(async (event): Promise<EEWResponse> => {
 	const query = getQuery(event);
 	const time = query.time as string;
 
@@ -43,7 +43,7 @@ export default defineEventHandler(async (event): Promise<EewResponse> => {
 	const targetUrl = `http://www.kmoni.bosai.go.jp/webservice/hypo/eew/${time}.json`;
 
 	try {
-		const response = await $fetch<EewResponse>(targetUrl, {
+		const response = await $fetch<EEWResponse>(targetUrl, {
 			method: "GET",
 			headers: {
 				Accept: "application/json, text/javascript, */*; q=0.01", // JSON 우선
