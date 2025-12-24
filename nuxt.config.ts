@@ -7,4 +7,7 @@ export default defineNuxtConfig({
     '~/assets/css/main.css',
     'maplibre-gl/dist/maplibre-gl.css'
   ],
+  routeRules: {
+    '/api/eew': { headers: { 'Cache-Control': 'max-age=3600' } },
+  },
 })
