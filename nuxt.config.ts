@@ -5,6 +5,6 @@ export default defineNuxtConfig({
 	modules: ["@nuxt/ui"],
 	css: ["~/assets/css/main.css", "maplibre-gl/dist/maplibre-gl.css"],
 	routeRules: {
-		"/api/**": { headers: { "Cache-Control": "public, s-maxage=60, maxage=60" } },
+		"/api/eew": { headers: { "Cache-Control": "public, s-maxage=60, maxage=60" } },
 	},
 });
