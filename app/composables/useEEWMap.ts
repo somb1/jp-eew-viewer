@@ -62,7 +62,7 @@ export const useEEWMap = () => {
 		geolocate.on("geolocate", (e) => {
 			const lng = e.coords.longitude;
 			const lat = e.coords.latitude;
-
+			
 			if (!userMarker) {
 				userMarker = new maplibregl.Marker({ color: "#ff0000" })
 					.setLngLat([lng, lat])
@@ -70,6 +70,7 @@ export const useEEWMap = () => {
 			} else {
 				userMarker.setLngLat([lng, lat]);
 			}
+			
 			highlightUserRegion(lng, lat);
 		});
 
@@ -140,7 +141,7 @@ export const useEEWMap = () => {
 			geolocate.trigger();
 		});
 	};
-	
+
 	// [추가] 외부에서 GeoJSON 데이터를 받아 맵을 업데이트하는 함수
 	const updateStationPoints = (geoJsonData: any) => {
 		if (!map || !map.getSource("realtime-stations")) return;
