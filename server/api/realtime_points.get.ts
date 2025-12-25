@@ -2,9 +2,7 @@ import { defineEventHandler, getQuery, createError } from "h3";
 import { Jimp } from "jimp";
 
 // source에 따라 다른 관측소 데이터를 사용하기 위해 각각 import
-// 지표(surface)용 데이터
 import stationsS from "~/assets/stations_surface.json";
-// 지중(borehole)용 데이터
 import stationsB from "~/assets/stations_borehole.json";
 
 // 허용된 파라미터 검증용
@@ -44,8 +42,6 @@ export default defineEventHandler(async (event) => {
     }
 
     // 소스(s/b)에 따라 사용할 관측소 리스트 선택
-    // 파일이 없을 경우를 대비해 기본값(stationsS)을 설정하거나 예외처리하는 것이 좋지만,
-    // 여기서는 요청하신 로직대로 분기합니다.
     const stations = source === "b" ? stationsB : stationsS;
 
     // 2. K-moni 이미지 URL 생성
@@ -55,7 +51,6 @@ export default defineEventHandler(async (event) => {
 
     try {
         // 3. 이미지 다운로드 (ArrayBuffer로 받음)
-        // [수정] 원본 요청 헤더 적용
         const imageBuffer = await $fetch<ArrayBuffer>(targetUrl, {
             responseType: "arrayBuffer",
             headers: {
@@ -72,14 +67,22 @@ export default defineEventHandler(async (event) => {
         // 4. Jimp로 이미지 로드
         const image = await Jimp.read(Buffer.from(imageBuffer));
 
-        // 5. 선택된 관측소 리스트를 순회하며 색상 추출
+        // 5. 관측소 리스트를 순회하며 색상 추출 (reduce 사용)
         const features = stations
             .filter((s: any) => s.x !== 0 && s.y !== 0) // 좌표가 0인(매핑 안 된) 관측소 무시
-            .map((s: any) => {
-                // (1) 해당 픽셀의 색상값(Int) 가져오기
+            .reduce((acc: any[], s: any) => {
+                // (1) 해당 픽셀의 색상값(Int) 가져오기 (0xRRGGBBAA)
                 const colorInt = image.getPixelColor(s.x, s.y);
 
-                // (2) 색상값을 CSS Hex String (#RRGGBB)으로 변환
+                // (2) Alpha 값 추출 (마지막 8비트)
+                const a = colorInt & 0xff;
+
+                // [수정] 투명도(Alpha)가 0이면 데이터 없음으로 간주하고 건너뜀
+                if (a === 0) {
+                    return acc;
+                }
+
+                // (3) 색상값을 CSS Hex String (#RRGGBB)으로 변환
                 const r = (colorInt >>> 24) & 0xff;
                 const g = (colorInt >>> 16) & 0xff;
                 const b = (colorInt >>> 8) & 0xff;
@@ -90,8 +93,8 @@ export default defineEventHandler(async (event) => {
                     g.toString(16).padStart(2, "0") +
                     b.toString(16).padStart(2, "0");
 
-                // (3) GeoJSON Feature 생성
-                return {
+                // (4) GeoJSON Feature 생성 후 배열에 추가
+                acc.push({
                     type: "Feature",
                     geometry: {
                         type: "Point",
@@ -102,8 +105,10 @@ export default defineEventHandler(async (event) => {
                         name: s.name,
                         color: hexColor,
                     },
-                };
-            });
+                });
+
+                return acc;
+            }, []);
 
         // 6. 결과 반환 (GeoJSON FeatureCollection)
         return {
@@ -111,9 +116,7 @@ export default defineEventHandler(async (event) => {
             features: features,
         };
     } catch (error: any) {
-        // console.error(`Realtime Points Error (${targetUrl}):`, error);
-
-        // 이미지 다운로드 실패(404 등) 시 빈 데이터 반환하여 클라이언트 중단 방지
+        // 이미지 다운로드 실패(404 등) 시 빈 데이터 반환
         if (error.response?.status === 404) {
             return { type: "FeatureCollection", features: [] };
         }
