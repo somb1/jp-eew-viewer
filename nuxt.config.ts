@@ -11,6 +11,6 @@ export default defineNuxtConfig({
 		"/api/realtime_points": {
 			headers: { "Cache-Control": "public, s-maxage=60, maxage=60" },
 		},
-		"/api/latest": { swr: 1 },
+		"/api/latest": { swr: true, headers: { "Cache-Control": "public, s-maxage=1, maxage=1" } },
 	},
 });
