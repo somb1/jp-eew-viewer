@@ -54,69 +54,62 @@
 					}}</span>
 				</div>
 
-				<template
-					v-if="
-						eewData.result?.status === 'success' &&
-						eewData.result?.message !== 'データがありません'
-					"
-				>
-					<div class="info-row warning">
-						<span class="label">calcintensity:</span>
-						<span class="value">{{ eewData.calcintensity }}</span>
-					</div>
-					<div class="info-row warning">
-						<span class="label">depth:</span>
-						<span class="value">{{ eewData.depth }}</span>
-					</div>
-					<div class="info-row warning">
-						<span class="label">is_cancel:</span>
-						<span class="value">{{ eewData.is_cancel }}</span>
-					</div>
-					<div class="info-row warning">
-						<span class="label">is_final:</span>
-						<span class="value">{{ eewData.is_final }}</span>
-					</div>
-					<div class="info-row warning">
-						<span class="label">is_training:</span>
-						<span class="value">{{ eewData.is_training }}</span>
-					</div>
-					<div class="info-row warning">
-						<span class="label">latitude:</span>
-						<span class="value">{{ eewData.latitude }}</span>
-					</div>
-					<div class="info-row warning">
-						<span class="label">longitude:</span>
-						<span class="value">{{ eewData.longitude }}</span>
-					</div>
-					<div class="info-row warning">
-						<span class="label">Magnitude:</span>
-						<span class="value">M{{ eewData.magunitude }}</span>
-					</div>
-					<div class="info-row warning">
-						<span class="label">origin_time:</span>
-						<span class="value">{{ eewData.origin_time }}</span>
-					</div>
-					<div class="info-row warning">
-						<span class="label">region_code:</span>
-						<span class="value">{{ eewData.region_code }}</span>
-					</div>
-					<div class="info-row warning">
-						<span class="label">region_name:</span>
-						<span class="value">{{ eewData.region_name }}</span>
-					</div>
-					<div class="info-row warning">
-						<span class="label">report_id:</span>
-						<span class="value">{{ eewData.report_id }}</span>
-					</div>
-					<div class="info-row warning">
-						<span class="label">report_num:</span>
-						<span class="value">{{ eewData.report_num }}</span>
-					</div>
-					<div class="info-row warning">
-						<span class="label">report_time:</span>
-						<span class="value">{{ eewData.report_time }}</span>
-					</div>
-				</template>
+				<div class="info-row warning">
+					<span class="label">calcintensity:</span>
+					<span class="value">{{ eewData.calcintensity }}</span>
+				</div>
+				<div class="info-row warning">
+					<span class="label">depth:</span>
+					<span class="value">{{ eewData.depth }}</span>
+				</div>
+				<div class="info-row warning">
+					<span class="label">is_cancel:</span>
+					<span class="value">{{ eewData.is_cancel }}</span>
+				</div>
+				<div class="info-row warning">
+					<span class="label">is_final:</span>
+					<span class="value">{{ eewData.is_final }}</span>
+				</div>
+				<div class="info-row warning">
+					<span class="label">is_training:</span>
+					<span class="value">{{ eewData.is_training }}</span>
+				</div>
+				<div class="info-row warning">
+					<span class="label">latitude:</span>
+					<span class="value">{{ eewData.latitude }}</span>
+				</div>
+				<div class="info-row warning">
+					<span class="label">longitude:</span>
+					<span class="value">{{ eewData.longitude }}</span>
+				</div>
+				<div class="info-row warning">
+					<span class="label">Magnitude:</span>
+					<span class="value">M{{ eewData.magunitude }}</span>
+				</div>
+				<div class="info-row warning">
+					<span class="label">origin_time:</span>
+					<span class="value">{{ eewData.origin_time }}</span>
+				</div>
+				<div class="info-row warning">
+					<span class="label">region_code:</span>
+					<span class="value">{{ eewData.region_code }}</span>
+				</div>
+				<div class="info-row warning">
+					<span class="label">region_name:</span>
+					<span class="value">{{ eewData.region_name }}</span>
+				</div>
+				<div class="info-row warning">
+					<span class="label">report_id:</span>
+					<span class="value">{{ eewData.report_id }}</span>
+				</div>
+				<div class="info-row warning">
+					<span class="label">report_num:</span>
+					<span class="value">{{ eewData.report_num }}</span>
+				</div>
+				<div class="info-row warning">
+					<span class="label">report_time:</span>
+					<span class="value">{{ eewData.report_time }}</span>
+				</div>
 			</div>
 			<div v-else-if="connectionStatus !== 'error'" class="loading">
 				Initializing...
@@ -130,11 +123,12 @@ import { ref, onMounted, onBeforeUnmount } from "vue";
 
 // 1. Map 관련 로직 가져오기
 const mapEl = ref<HTMLDivElement | null>(null);
-const { mouseLng, mouseLat, initMap, destroyMap } = useEEWMap();
+const { mouseLng, mouseLat, initMap, destroyMap, updateStationPoints } = useEEWMap();
 
 // 2. EEW 관련 로직 가져오기
 const {
 	eewData,
+	stationPointsData,
 	currentDisplayTime,
 	connectionStatus,
 	lastErrorMessage,
@@ -157,6 +151,26 @@ onMounted(() => {
 onBeforeUnmount(() => {
 	stopEEW();
 	destroyMap();
+});
+
+// 1. 현재 탭의 가시성 상태를 반응형 변수(Ref)로 가져옵니다.
+// 값은 'visible', 'hidden', 'prerender' 중 하나입니다.
+const visibility = useDocumentVisibility();
+
+// 2. visibility 상태가 변할 때마다 감지합니다.
+watch(visibility, (current, previous) => {
+	// 탭이 'hidden'에서 'visible'로 바뀌었을 때 (사용자가 돌아왔을 때)
+	if (current === "visible" && previous === "hidden") {
+		console.log("탭 복귀 감지: 데이터/시간 동기화 실행");
+		handleManualSync(); // 동기화 함수 실행
+	}
+});
+
+// [추가] 관측소 데이터가 변경되면 지도 업데이트
+watch(stationPointsData, (newData) => {
+    if (newData) {
+        updateStationPoints(newData);
+    }
 });
 </script>
 
@@ -232,7 +246,6 @@ onBeforeUnmount(() => {
 .status-badge.live {
 	background-color: #28a745;
 	box-shadow: 0 0 8px rgba(40, 167, 69, 0.6);
-	animation: pulse 1.5s infinite;
 }
 
 .status-badge.error {
@@ -326,21 +339,6 @@ onBeforeUnmount(() => {
 	font-style: italic;
 	text-align: center;
 	padding: 4px 0;
-}
-
-@keyframes pulse {
-	0% {
-		transform: scale(0.95);
-		opacity: 1;
-	}
-	50% {
-		transform: scale(1.15);
-		opacity: 0.8;
-	}
-	100% {
-		transform: scale(0.95);
-		opacity: 1;
-	}
 }
 
 @keyframes blink {

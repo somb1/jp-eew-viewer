@@ -5,6 +5,9 @@ export const useEEWMonitor = () => {
 	const connectionStatus = ref<"init" | "syncing" | "live" | "error">("init");
 	const lastErrorMessage = ref<string | null>(null);
 
+	// [추가] 포인트 데이터 상태
+	const stationPointsData = ref<any>(null);
+
 	// 내부 변수
 	let timerId: any = null;
 	let simulatedTime: Date | null = null;
@@ -44,18 +47,44 @@ export const useEEWMonitor = () => {
 			currentDisplayTime.value = formatDateToDisplay(simulatedTime);
 
 			try {
-				const res = await fetch(`/api/eew?time=${timeParam}`).then(
-					(r) => {
-						if (!r.ok) throw new Error(`HTTP ${r.status}`);
-						return r.json();
-					}
+				// ====================================================
+				// [수정] 병렬로 EEW 데이터와 포인트 데이터 요청
+				// ====================================================
+				const eewPromise = fetch(`/api/eew?time=${timeParam}`).then(
+					(r) => r.json()
 				);
 
-				eewData.value = res;
-				connectionStatus.value = "live";
-				lastErrorMessage.value = null;
+				// 관측소 데이터 요청 (type=jma, source=s 등 필요에 따라 변경 가능)
+				const stationsPromise = fetch(
+					`/api/realtime_points?time=${timeParam}&type=acmap&source=s`
+				).then((r) => {
+					if (!r.ok && r.status !== 404)
+						throw new Error("Station Fetch Failed");
+					return r.json();
+				});
+
+				// Promise.allSettled를 사용하여 하나가 실패해도 나머지는 동작하도록 함
+				const [eewRes, stationRes] = await Promise.allSettled([
+					eewPromise,
+					stationsPromise,
+				]);
+
+				// 1. EEW 응답 처리
+				if (eewRes.status === "fulfilled") {
+					eewData.value = eewRes.value;
+					connectionStatus.value = "live";
+					lastErrorMessage.value = null;
+				} else {
+					// EEW가 실패하면 에러 처리
+					throw eewRes.reason;
+				}
+
+				// 2. 관측소 응답 처리
+				if (stationRes.status === "fulfilled") {
+					stationPointsData.value = stationRes.value;
+				}
 			} catch (err: any) {
-				console.error("EEW Fetch Error", err);
+				console.error("Fetch Loop Error", err);
 				connectionStatus.value = "error";
 				lastErrorMessage.value = "Connection Lost";
 			}
@@ -89,6 +118,7 @@ export const useEEWMonitor = () => {
 
 	return {
 		eewData,
+		stationPointsData,
 		currentDisplayTime,
 		connectionStatus,
 		lastErrorMessage,
