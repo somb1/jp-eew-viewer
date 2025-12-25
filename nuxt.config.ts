@@ -12,7 +12,7 @@ export default defineNuxtConfig({
 			headers: { "Cache-Control": "public, s-maxage=60, maxage=60" },
 		},
 		"/api/latest": {
-			headers: { "Cache-Control": "public, s-maxage=1, maxage=1, stale-while-revalidate=1" } 
+			headers: { "Cache-Control": "public, s-maxage=1, maxage=0" } 
 		},
 	},
 });
