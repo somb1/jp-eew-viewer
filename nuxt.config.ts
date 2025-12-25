@@ -6,10 +6,10 @@ export default defineNuxtConfig({
 	css: ["~/assets/css/main.css", "maplibre-gl/dist/maplibre-gl.css"],
 	routeRules: {
 		"/api/eew": {
-			headers: { "Cache-Control": "public, s-maxage=60, maxage=60" },
+			headers: { "Cache-Control": "public, s-maxage=3600, maxage=60" },
 		},
 		"/api/realtime_points": {
-			headers: { "Cache-Control": "public, s-maxage=60, maxage=60" },
+			headers: { "Cache-Control": "public, s-maxage=3600, maxage=60" },
 		},
 		"/api/latest": {
 			headers: { "Cache-Control": "public, s-maxage=1, maxage=0" } 
