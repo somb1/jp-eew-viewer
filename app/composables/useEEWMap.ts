@@ -41,14 +41,14 @@ export const useEEWMap = () => {
 			zoom: 6,
 			maxBounds: MAX_BOUNDS,
 		});
-		/*
+		
 		map.addControl(
 			new maplibregl.NavigationControl({
-				showZoom: false,
+				showZoom: true,
 				showCompass: false,
-			})
+			}), "bottom-right"
 		);
-		*/
+		
 		map.dragRotate.disable();
 		map.touchZoomRotate.disableRotation();
 
@@ -57,7 +57,7 @@ export const useEEWMap = () => {
 			showUserLocation: false,
 			fitBoundsOptions: { maxZoom: 6 },
 		});
-		map.addControl(geolocate);
+		map.addControl(geolocate, "bottom-right");
 
 		geolocate.on("geolocate", (e) => {
 			const lng = e.coords.longitude;
