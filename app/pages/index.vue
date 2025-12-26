@@ -123,7 +123,8 @@ import { ref, onMounted, onBeforeUnmount } from "vue";
 
 // 1. Map 관련 로직 가져오기
 const mapEl = ref<HTMLDivElement | null>(null);
-const { mouseLng, mouseLat, initMap, destroyMap, updateStationPoints } = useEEWMap();
+const { mouseLng, mouseLat, initMap, destroyMap, updateStationPoints } =
+	useEEWMap();
 
 // 2. EEW 관련 로직 가져오기
 const {
@@ -168,9 +169,9 @@ watch(visibility, (current, previous) => {
 
 // [추가] 관측소 데이터가 변경되면 지도 업데이트
 watch(stationPointsData, (newData) => {
-    if (newData) {
-        updateStationPoints(newData);
-    }
+	if (newData) {
+		updateStationPoints(newData);
+	}
 });
 </script>
 
@@ -197,30 +198,49 @@ watch(stationPointsData, (newData) => {
 	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
+/* ---------------------------------------------------------
+   EEW Monitor 패널 스타일 (PC/모바일 공통 적용)
+   - 화면 하단 고정
+   - 가로로 길게 배치 (우측 버튼 공간 60px 제외)
+--------------------------------------------------------- */
 .eew-info {
 	position: absolute;
-	top: 50%;
-	right: 10px;
-	transform: translateY(-50%);
 
+	/* 위치 설정: 하단 고정 */
+	bottom: 52px;
+	left: 12px;
+	/* 우측 하단 지도 컨트롤(줌, 위치 등) 회피를 위해 60px 여백 확보 */
+	right: 60px;
+	top: auto; /* 상단 위치 해제 */
+	transform: none; /* 중앙 정렬 해제 */
+
+	/* 모양 및 색상 */
 	background: rgba(255, 255, 255, 0.95);
-	padding: 12px;
+	padding: 10px 12px;
 	border-radius: 8px;
 	font-size: 13px;
 	z-index: 10;
-	min-width: 210px;
-	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 	color: #333;
 	backdrop-filter: blur(4px);
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+
+	/* 내부 레이아웃: 세로 스택 (헤더 -> 내용) */
+	display: flex;
+	flex-direction: column;
+
+	/* 내용이 많을 경우 스크롤 처리 */
+	max-height: 40vh;
+	overflow-y: auto;
 }
 
+/* 헤더 영역 (제목, Sync 버튼) */
 .header-row {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
 	border-bottom: 1px solid #eee;
-	padding-bottom: 8px;
-	margin-bottom: 8px;
+	padding-bottom: 6px;
+	margin-bottom: 6px;
 }
 
 .title-group {
@@ -234,6 +254,7 @@ watch(stationPointsData, (newData) => {
 	font-size: 14px;
 }
 
+/* 상태 표시 배지 (초록/빨강/노랑 점) */
 .status-badge {
 	display: inline-block;
 	width: 10px;
@@ -257,10 +278,10 @@ watch(stationPointsData, (newData) => {
 	animation: blink 1s infinite;
 }
 
-/* 상태 텍스트 스타일 */
+/* 상태 텍스트 (LIVE FEED 등) */
 .status-text-row {
 	font-size: 10px;
-	margin-bottom: 8px;
+	margin-bottom: 6px;
 	font-weight: 700;
 	letter-spacing: 0.5px;
 }
@@ -284,16 +305,18 @@ watch(stationPointsData, (newData) => {
 	border: 1px solid #fbd5d5;
 }
 
+/* 동기화 버튼 */
 .sync-btn {
 	background-color: #007bff;
 	color: white;
 	border: none;
 	border-radius: 4px;
-	padding: 4px 8px;
+	padding: 2px 8px;
 	font-size: 11px;
 	cursor: pointer;
 	transition: all 0.2s ease;
 	font-weight: 600;
+	height: 24px;
 }
 
 .sync-btn:hover:not(:disabled) {
@@ -305,12 +328,24 @@ watch(stationPointsData, (newData) => {
 	cursor: wait;
 }
 
-.info-row {
+/* 데이터 상세 영역 스타일 
+   가로로 나열되도록 flex-wrap 설정 
+*/
+.eew-details {
 	display: flex;
-	justify-content: space-between;
+	flex-wrap: wrap; /* 공간이 부족하면 줄바꿈 */
+	gap: 0 16px; /* 항목 간 간격 */
 	align-items: center;
-	margin-bottom: 4px;
+}
+
+/* 개별 정보 항목 (Label + Value) */
+.info-row {
+	display: inline-flex; /* 가로 배치 */
+	align-items: center;
+	gap: 6px;
+	margin-bottom: 2px;
 	line-height: 1.4;
+	white-space: nowrap; /* 줄바꿈 방지 */
 }
 
 .label {
@@ -322,8 +357,10 @@ watch(stationPointsData, (newData) => {
 	font-family: "Roboto Mono", monospace;
 	font-weight: 500;
 	color: #111;
+	font-size: 12px;
 }
 
+/* 경고성 데이터(진도, 마그니튜드 등) 강조 */
 .warning .label {
 	color: #d32f2f;
 	font-weight: 600;
@@ -339,6 +376,7 @@ watch(stationPointsData, (newData) => {
 	font-style: italic;
 	text-align: center;
 	padding: 4px 0;
+	font-size: 12px;
 }
 
 @keyframes blink {
