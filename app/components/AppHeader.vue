@@ -5,8 +5,6 @@
 		</template>
 
 		<template #right>
-			<ULocaleSelect v-model="locale" :locales="[en, ja, ko]" />
-			<UColorModeSelect />
 			<UTooltip text="Open on GitHub">
 				<UButton
 					color="neutral"
@@ -22,8 +20,5 @@
 </template>
 
 <script setup lang="ts">
-import { en, ja, ko } from "@nuxt/ui/locale";
-
-const locale = ref("en");
 
 </script>
