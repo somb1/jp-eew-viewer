@@ -12,7 +12,7 @@
 					<span class="relative flex h-2.5 w-2.5">
 						<span
 							v-if="status === 'live' || status === 'syncing'"
-							class="absolute inline-flex h-full w-full animate-ping rounded-full opacity-75"
+							class="absolute inline-flex h-full w-full rounded-full opacity-75"
 							:class="{
 								'bg-green-400': status === 'live',
 								'bg-yellow-400': status === 'syncing',
