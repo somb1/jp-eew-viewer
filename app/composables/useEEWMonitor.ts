@@ -85,7 +85,7 @@ export const useEEWMonitor = () => {
 				lastErrorMessage.value = "Connection Lost";
 
 				// 에러 시 포인트 데이터 비우기 (선택 사항)
-				// stationPointsData.value = { type: "FeatureCollection", features: [] };
+				stationPointsData.value = { type: "FeatureCollection", features: [] };
 			}
 		}, 1000);
 	};
