@@ -83,7 +83,7 @@
 				class="flex items-center justify-center rounded-lg border border-gray-700 bg-gray-900/80 p-3 text-gray-300 backdrop-blur shadow-lg"
 			>
 				<div
-					class="mr-3 h-2 w-2 animate-ping rounded-full bg-gray-400"
+					class="mr-3 h-2 w-2 rounded-full bg-gray-400"
 				></div>
 				<span class="text-sm font-semibold tracking-wide"
 					>데이터 수신 중...</span
@@ -119,7 +119,7 @@
 					<div class="flex items-center gap-2">
 						<span v-if="!isCancel" class="relative flex h-3 w-3">
 							<span
-								class="absolute inline-flex h-full w-full animate-ping rounded-full bg-white opacity-75"
+								class="absolute inline-flex h-full w-full rounded-full bg-white opacity-75"
 							></span>
 							<span
 								class="relative inline-flex h-3 w-3 rounded-full bg-red-200"
