@@ -128,7 +128,7 @@ export const useEEWMap = () => {
 			container,
 			style: "/positron.json",
 			center: [139.6917, 35.6894],
-			zoom: 6,
+			zoom: 4.75,
 			maxBounds: MAX_BOUNDS,
 			attributionControl: false,
 		});
@@ -155,14 +155,15 @@ export const useEEWMap = () => {
 			"bottom-right"
 		);
 
-		// ... (이하 로직 동일) ...
 		map.dragRotate.disable();
 		map.touchZoomRotate.disableRotation();
+		map.touchPitch.disable();
+		map.boxZoom.disable();
 
 		const geolocate = new maplibregl.GeolocateControl({
 			trackUserLocation: false,
 			showUserLocation: false,
-			fitBoundsOptions: { maxZoom: 6 },
+			fitBoundsOptions: { maxZoom: 4.75 },
 		});
 		map.addControl(geolocate, "bottom-right");
 
