@@ -1,20 +1,63 @@
+import { ref } from "vue";
 import maplibregl from "maplibre-gl";
+import findContainingPolygon from "~/utils/findContainingPolygon";
+
+// 1. [기존] EEW Monitor용 컨트롤 (좌측 하단)
+class EEWControl implements maplibregl.IControl {
+	private container: HTMLElement;
+	constructor() {
+		this.container = document.createElement("div");
+		this.container.id = "eew-control-portal";
+		this.container.className = "maplibregl-ctrl";
+		this.container.style.pointerEvents = "auto";
+		// 여백 제거 (스타일에서 제어)
+		this.container.style.margin = "0";
+	}
+	onAdd() {
+		return this.container;
+	}
+	onRemove() {
+		this.container.remove();
+	}
+}
+
+// 2. [NEW] System Status Bar용 컨트롤 (우측 상단)
+class SystemStatusControl implements maplibregl.IControl {
+	private container: HTMLElement;
+	constructor() {
+		this.container = document.createElement("div");
+		this.container.id = "system-status-portal";
+		// maplibregl-ctrl 클래스는 기본 마진을 가지므로 필요시 커스텀 클래스 사용
+		this.container.className = "maplibregl-ctrl";
+		this.container.style.pointerEvents = "auto";
+		// MapLibre 기본 컨트롤들과의 간격 조정
+		this.container.style.marginBottom = "10px";
+	}
+	onAdd() {
+		return this.container;
+	}
+	onRemove() {
+		this.container.remove();
+	}
+}
 
 export const useEEWMap = () => {
 	const mouseLng = ref<number | null>(null);
 	const mouseLat = ref<number | null>(null);
+	const isMapLoaded = ref(false);
 
 	let map: maplibregl.Map | null = null;
 	let userMarker: maplibregl.Marker | null = null;
 	let district: GeoJSON.FeatureCollection | null = null;
 
+	// ... (MAX_BOUNDS, highlightUserRegion 등 기존 로직 동일) ...
 	const MAX_BOUNDS = new maplibregl.LngLatBounds(
 		[80.5184, -0.4539],
 		[193.5944, 60.4917]
 	);
 
-	// 지역 하이라이트 로직
 	const highlightUserRegion = async (lng: number, lat: number) => {
+		// ... (기존 코드 생략) ...
 		if (!map) return;
 		if (!district)
 			district = await fetch("/district.geojson").then((r) => r.json());
@@ -40,15 +83,26 @@ export const useEEWMap = () => {
 			center: [139.6917, 35.6894],
 			zoom: 6,
 			maxBounds: MAX_BOUNDS,
+			attributionControl: false,
 		});
-		
+
+		map.addControl(new maplibregl.AttributionControl(), "top-left");
+
+		// [NEW] 상태바 컨트롤 추가 (top-right의 가장 위쪽에 배치하고 싶다면 먼저 추가)
+		map.addControl(new SystemStatusControl(), "top-right");
+
+		// [기존] EEW 모니터 컨트롤 추가
+		map.addControl(new EEWControl(), "bottom-left");
+
 		map.addControl(
 			new maplibregl.NavigationControl({
 				showZoom: true,
 				showCompass: false,
-			}), "bottom-right"
+			}),
+			"top-right"
 		);
-		
+
+		// ... (이하 기존 로직 동일) ...
 		map.dragRotate.disable();
 		map.touchZoomRotate.disableRotation();
 
@@ -57,12 +111,12 @@ export const useEEWMap = () => {
 			showUserLocation: false,
 			fitBoundsOptions: { maxZoom: 6 },
 		});
-		map.addControl(geolocate, "bottom-right");
+		map.addControl(geolocate, "top-right");
 
 		geolocate.on("geolocate", (e) => {
 			const lng = e.coords.longitude;
 			const lat = e.coords.latitude;
-			
+
 			if (!userMarker) {
 				userMarker = new maplibregl.Marker({ color: "#ff0000" })
 					.setLngLat([lng, lat])
@@ -70,7 +124,7 @@ export const useEEWMap = () => {
 			} else {
 				userMarker.setLngLat([lng, lat]);
 			}
-			
+
 			highlightUserRegion(lng, lat);
 		});
 
@@ -80,6 +134,7 @@ export const useEEWMap = () => {
 		});
 
 		map.on("load", async () => {
+			// ... (기존 레이어 추가 로직 생략 - 그대로 유지) ...
 			map!.addSource("prefecture", {
 				type: "geojson",
 				data: "/prefecture.geojson",
@@ -90,6 +145,7 @@ export const useEEWMap = () => {
 				source: "prefecture",
 				paint: { "line-color": "#555", "line-width": 1 },
 			});
+
 			map!.addSource("district", {
 				type: "geojson",
 				data: "/district.geojson",
@@ -104,6 +160,7 @@ export const useEEWMap = () => {
 					"line-dasharray": [4, 4],
 				},
 			});
+
 			map!.addSource("region-selected", {
 				type: "geojson",
 				data: { type: "FeatureCollection", features: [] },
@@ -115,37 +172,31 @@ export const useEEWMap = () => {
 				paint: { "fill-color": "#ff0000", "fill-opacity": 0.3 },
 			});
 
-			// ============================================
-			// [추가] 실시간 관측소 점(Stations) 레이어
-			// ============================================
 			map!.addSource("realtime-stations", {
 				type: "geojson",
-				data: { type: "FeatureCollection", features: [] }, // 초기엔 빈 데이터
+				data: { type: "FeatureCollection", features: [] },
 			});
-
 			map!.addLayer({
 				id: "realtime-stations-layer",
 				type: "circle",
 				source: "realtime-stations",
 				paint: {
-					// GeoJSON properties의 'color' 값을 가져와서 색칠
 					"circle-color": ["get", "color"],
-					"circle-radius": 4, // 점 크기
-					"circle-stroke-width": 0.5, // 테두리 두께
-					"circle-stroke-color": "#fff", // 테두리 색상 (흰색)
-					"circle-opacity": 0.9, // 불투명도
+					"circle-radius": 4,
+					"circle-stroke-width": 0.5,
+					"circle-stroke-color": "#fff",
+					"circle-opacity": 0.9,
 				},
 			});
 
-			// 로드 완료 후 바로 위치 추적 시도
+			isMapLoaded.value = true;
 			geolocate.trigger();
 		});
 	};
 
-	// [추가] 외부에서 GeoJSON 데이터를 받아 맵을 업데이트하는 함수
+	// ... (updateStationPoints, destroyMap 등 기존 로직 동일) ...
 	const updateStationPoints = (geoJsonData: any) => {
 		if (!map || !map.getSource("realtime-stations")) return;
-
 		const source = map.getSource(
 			"realtime-stations"
 		) as maplibregl.GeoJSONSource;
@@ -153,6 +204,7 @@ export const useEEWMap = () => {
 	};
 
 	const destroyMap = () => {
+		isMapLoaded.value = false;
 		userMarker?.remove();
 		map?.remove();
 	};
@@ -160,6 +212,7 @@ export const useEEWMap = () => {
 	return {
 		mouseLng,
 		mouseLat,
+		isMapLoaded,
 		initMap,
 		destroyMap,
 		updateStationPoints,
