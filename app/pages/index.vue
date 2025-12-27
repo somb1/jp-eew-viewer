@@ -1,17 +1,9 @@
 <template>
 	<div ref="mapEl" class="map">
-		<div class="mouse-info">
-			<div>Lng: {{ mouseLng }}</div>
-			<div>Lat: {{ mouseLat }}</div>
-		</div>
-
 		<template v-if="isMapLoaded">
-			<Teleport to="#eew-control-portal">
-				<EEWMonitor :eew-data="eewData" :status="connectionStatus" />
-			</Teleport>
-
 			<Teleport to="#system-status-portal">
 				<SystemStatusBar
+					:eew-data="eewData"
 					:current-time="currentDisplayTime"
 					:status="connectionStatus"
 					@sync="handleManualSync"
@@ -28,8 +20,7 @@ import { useDocumentVisibility } from "@vueuse/core";
 // 맵 및 EEW 관련 Composable 사용
 const mapEl = ref<HTMLDivElement | null>(null);
 const {
-	mouseLng,
-	mouseLat,
+	// [제거됨] mouseLng, mouseLat
 	initMap,
 	destroyMap,
 	updateStationPoints,
@@ -84,16 +75,5 @@ watch(stationPointsData, (newData) => {
 	overflow: hidden;
 }
 
-.mouse-info {
-	position: absolute;
-	top: 10px;
-	left: 50%;
-	background: rgba(0, 0, 0, 0.5);
-	color: #fff;
-	padding: 4px 8px;
-	border-radius: 4px;
-	font-size: 10px;
-	pointer-events: none;
-	z-index: 5;
-}
+/* [제거됨] .mouse-info CSS 삭제 */
 </style>

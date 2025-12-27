@@ -1,8 +1,5 @@
 <template>
-	<UHeader>
-		<template #title>
-			<span class="font-bold">JP EEW Viewer</span>
-		</template>
+	<UHeader title="JP EEW Viewer" mode="drawer">
 
 		<template #right>
 			<UTooltip text="Open on GitHub">
@@ -16,9 +13,11 @@
 				/>
 			</UTooltip>
 		</template>
+
+		<template #body>
+
+		</template>
 	</UHeader>
 </template>
 
-<script setup lang="ts">
-
-</script>
+<script setup lang="ts"></script>
