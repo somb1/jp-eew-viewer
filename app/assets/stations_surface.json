@@ -1148,8 +1148,8 @@
         "lat": 33.8425,
         "lon": 130.5087,
         "prefecture": "FUKUOKAKEN",
-        "x": 0,
-        "y": 0
+        "x": 37,
+        "y": 304
     },
     {
         "code": "FKO002",
@@ -1157,8 +1157,8 @@
         "lat": 33.8253,
         "lon": 130.7058,
         "prefecture": "FUKUOKAKEN",
-        "x": 0,
-        "y": 0
+        "x": 42,
+        "y": 305
     },
     {
         "code": "FKO003",
@@ -1166,8 +1166,8 @@
         "lat": 33.8324,
         "lon": 130.9013,
         "prefecture": "FUKUOKAKEN",
-        "x": 0,
-        "y": 0
+        "x": 46,
+        "y": 305
     },
     {
         "code": "FKO004",
@@ -1175,8 +1175,8 @@
         "lat": 33.7366,
         "lon": 131.0121,
         "prefecture": "FUKUOKAKEN",
-        "x": 0,
-        "y": 0
+        "x": 49,
+        "y": 307
     },
     {
         "code": "FKO005",
@@ -1184,8 +1184,8 @@
         "lat": 33.652,
         "lon": 130.6965,
         "prefecture": "FUKUOKAKEN",
-        "x": 0,
-        "y": 0
+        "x": 42,
+        "y": 309
     },
     {
         "code": "FKO006",
@@ -1193,8 +1193,8 @@
         "lat": 33.6642,
         "lon": 130.4532,
         "prefecture": "FUKUOKAKEN",
-        "x": 0,
-        "y": 0
+        "x": 37,
+        "y": 309
     },
     {
         "code": "FKO007",
@@ -1202,8 +1202,8 @@
         "lat": 33.5614,
         "lon": 130.2024,
         "prefecture": "FUKUOKAKEN",
-        "x": 0,
-        "y": 0
+        "x": 32,
+        "y": 311
     },
     {
         "code": "FKO008",
@@ -1211,8 +1211,8 @@
         "lat": 33.5712,
         "lon": 130.8546,
         "prefecture": "FUKUOKAKEN",
-        "x": 0,
-        "y": 0
+        "x": 45,
+        "y": 311
     },
     {
         "code": "FKO009",
@@ -1220,8 +1220,8 @@
         "lat": 33.4954,
         "lon": 130.5164,
         "prefecture": "FUKUOKAKEN",
-        "x": 0,
-        "y": 0
+        "x": 39,
+        "y": 313
     },
     {
         "code": "FKO010",
@@ -1229,8 +1229,8 @@
         "lat": 33.4236,
         "lon": 130.6691,
         "prefecture": "FUKUOKAKEN",
-        "x": 0,
-        "y": 0
+        "x": 42,
+        "y": 314
     },
     {
         "code": "FKO011",
@@ -1238,8 +1238,8 @@
         "lat": 33.3237,
         "lon": 130.5118,
         "prefecture": "FUKUOKAKEN",
-        "x": 0,
-        "y": 0
+        "x": 38,
+        "y": 317
     },
     {
         "code": "FKO012",
@@ -1247,8 +1247,8 @@
         "lat": 33.332,
         "lon": 130.794,
         "prefecture": "FUKUOKAKEN",
-        "x": 0,
-        "y": 0
+        "x": 45,
+        "y": 316
     },
     {
         "code": "FKO013",
@@ -1256,8 +1256,8 @@
         "lat": 33.2254,
         "lon": 130.5608,
         "prefecture": "FUKUOKAKEN",
-        "x": 0,
-        "y": 0
+        "x": 39,
+        "y": 319
     },
     {
         "code": "FKO014",
@@ -1265,8 +1265,8 @@
         "lat": 33.1496,
         "lon": 130.8183,
         "prefecture": "FUKUOKAKEN",
-        "x": 0,
-        "y": 0
+        "x": 45,
+        "y": 321
     },
     {
         "code": "FKO015",
@@ -1274,8 +1274,8 @@
         "lat": 33.1629,
         "lon": 130.4052,
         "prefecture": "FUKUOKAKEN",
-        "x": 0,
-        "y": 0
+        "x": 36,
+        "y": 321
     },
     {
         "code": "FKO016",
@@ -1283,8 +1283,8 @@
         "lat": 33.0159,
         "lon": 130.4472,
         "prefecture": "FUKUOKAKEN",
-        "x": 0,
-        "y": 0
+        "x": 37,
+        "y": 325
     },
     {
         "code": "FKS001",
@@ -4595,8 +4595,8 @@
         "lat": 32.0916,
         "lon": 130.3519,
         "prefecture": "KAGOSHIMAKEN",
-        "x": 0,
-        "y": 0
+        "x": 35,
+        "y": 347
     },
     {
         "code": "KGS003",
@@ -4613,8 +4613,8 @@
         "lat": 32.0145,
         "lon": 130.1927,
         "prefecture": "KAGOSHIMAKEN",
-        "x": 0,
-        "y": 0
+        "x": 32,
+        "y": 348
     },
     {
         "code": "KGS005",
@@ -4721,8 +4721,8 @@
         "lat": 31.4162,
         "lon": 130.3225,
         "prefecture": "KAGOSHIMAKEN",
-        "x": 34,
-        "y": 363
+        "x": 35,
+        "y": 364
     },
     {
         "code": "KGS017",
@@ -5000,8 +5000,8 @@
         "lat": 33.0189,
         "lon": 130.6846,
         "prefecture": "KUMAMOTOKEN",
-        "x": 0,
-        "y": 0
+        "x": 42,
+        "y": 324
     },
     {
         "code": "KMM003",
@@ -5009,8 +5009,8 @@
         "lat": 32.9335,
         "lon": 130.5477,
         "prefecture": "KUMAMOTOKEN",
-        "x": 0,
-        "y": 0
+        "x": 39,
+        "y": 327
     },
     {
         "code": "KMM004",
@@ -5027,8 +5027,8 @@
         "lat": 32.8761,
         "lon": 130.8771,
         "prefecture": "KUMAMOTOKEN",
-        "x": 0,
-        "y": 0
+        "x": 46,
+        "y": 328
     },
     {
         "code": "KMM006",
@@ -5036,8 +5036,8 @@
         "lat": 32.7934,
         "lon": 130.7772,
         "prefecture": "KUMAMOTOKEN",
-        "x": 0,
-        "y": 0
+        "x": 43,
+        "y": 330
     },
     {
         "code": "KMM007",
@@ -5045,8 +5045,8 @@
         "lat": 32.8268,
         "lon": 131.1224,
         "prefecture": "KUMAMOTOKEN",
-        "x": 0,
-        "y": 0
+        "x": 52,
+        "y": 328
     },
     {
         "code": "KMM008",
@@ -5054,8 +5054,8 @@
         "lat": 32.6875,
         "lon": 130.6598,
         "prefecture": "KUMAMOTOKEN",
-        "x": 0,
-        "y": 0
+        "x": 41,
+        "y": 333
     },
     {
         "code": "KMM009",
@@ -5063,8 +5063,8 @@
         "lat": 32.6864,
         "lon": 130.9886,
         "prefecture": "KUMAMOTOKEN",
-        "x": 0,
-        "y": 0
+        "x": 47,
+        "y": 333
     },
     {
         "code": "KMM010",
@@ -5072,8 +5072,8 @@
         "lat": 32.6134,
         "lon": 130.4873,
         "prefecture": "KUMAMOTOKEN",
-        "x": 0,
-        "y": 0
+        "x": 37,
+        "y": 334
     },
     {
         "code": "KMM011",
@@ -5081,8 +5081,8 @@
         "lat": 32.6166,
         "lon": 130.8635,
         "prefecture": "KUMAMOTOKEN",
-        "x": 0,
-        "y": 0
+        "x": 46,
+        "y": 334
     },
     {
         "code": "KMM012",
@@ -5090,8 +5090,8 @@
         "lat": 32.5099,
         "lon": 130.5908,
         "prefecture": "KUMAMOTOKEN",
-        "x": 0,
-        "y": 0
+        "x": 40,
+        "y": 337
     },
     {
         "code": "KMM013",
@@ -5099,8 +5099,8 @@
         "lat": 32.3644,
         "lon": 130.5089,
         "prefecture": "KUMAMOTOKEN",
-        "x": 0,
-        "y": 0
+        "x": 39,
+        "y": 340
     },
     {
         "code": "KMM014",
@@ -5108,8 +5108,8 @@
         "lat": 32.3961,
         "lon": 130.8273,
         "prefecture": "KUMAMOTOKEN",
-        "x": 0,
-        "y": 0
+        "x": 45,
+        "y": 340
     },
     {
         "code": "KMM015",
@@ -5117,8 +5117,8 @@
         "lat": 32.2161,
         "lon": 130.4059,
         "prefecture": "KUMAMOTOKEN",
-        "x": 0,
-        "y": 0
+        "x": 37,
+        "y": 343
     },
     {
         "code": "KMM016",
@@ -5126,8 +5126,8 @@
         "lat": 32.1965,
         "lon": 130.7757,
         "prefecture": "KUMAMOTOKEN",
-        "x": 0,
-        "y": 0
+        "x": 44,
+        "y": 346
     },
     {
         "code": "KMM017",
@@ -5135,8 +5135,8 @@
         "lat": 32.2567,
         "lon": 130.9245,
         "prefecture": "KUMAMOTOKEN",
-        "x": 0,
-        "y": 0
+        "x": 48,
+        "y": 342
     },
     {
         "code": "KMM018",
@@ -5144,8 +5144,8 @@
         "lat": 32.3941,
         "lon": 130.3898,
         "prefecture": "KUMAMOTOKEN",
-        "x": 0,
-        "y": 0
+        "x": 35,
+        "y": 339
     },
     {
         "code": "KMM019",
@@ -5153,8 +5153,8 @@
         "lat": 32.4548,
         "lon": 130.1807,
         "prefecture": "KUMAMOTOKEN",
-        "x": 0,
-        "y": 0
+        "x": 32,
+        "y": 338
     },
     {
         "code": "KMM020",
@@ -5171,8 +5171,8 @@
         "lat": 32.3793,
         "lon": 129.9996,
         "prefecture": "KUMAMOTOKEN",
-        "x": 0,
-        "y": 0
+        "x": 28,
+        "y": 340
     },
     {
         "code": "KMM022",
@@ -5180,8 +5180,8 @@
         "lat": 32.1945,
         "lon": 130.027,
         "prefecture": "KUMAMOTOKEN",
-        "x": 0,
-        "y": 0
+        "x": 28,
+        "y": 344
     },
     {
         "code": "KNG001",
@@ -5990,8 +5990,8 @@
         "lat": 32.705,
         "lon": 131.3086,
         "prefecture": "MIYAZAKIKEN",
-        "x": 0,
-        "y": 0
+        "x": 55,
+        "y": 332
     },
     {
         "code": "MYZ002",
@@ -6008,8 +6008,8 @@
         "lat": 32.5659,
         "lon": 131.6602,
         "prefecture": "MIYAZAKIKEN",
-        "x": 0,
-        "y": 0
+        "x": 62,
+        "y": 335
     },
     {
         "code": "MYZ004",
@@ -6017,8 +6017,8 @@
         "lat": 32.3888,
         "lon": 131.3338,
         "prefecture": "MIYAZAKIKEN",
-        "x": 0,
-        "y": 0
+        "x": 54,
+        "y": 339
     },
     {
         "code": "MYZ005",
@@ -6026,8 +6026,8 @@
         "lat": 32.4286,
         "lon": 131.6009,
         "prefecture": "MIYAZAKIKEN",
-        "x": 0,
-        "y": 0
+        "x": 60,
+        "y": 338
     },
     {
         "code": "MYZ006",
@@ -6035,8 +6035,8 @@
         "lat": 32.2564,
         "lon": 131.5609,
         "prefecture": "MIYAZAKIKEN",
-        "x": 0,
-        "y": 0
+        "x": 61,
+        "y": 343
     },
     {
         "code": "MYZ007",
@@ -6053,8 +6053,8 @@
         "lat": 32.1056,
         "lon": 131.3931,
         "prefecture": "MIYAZAKIKEN",
-        "x": 0,
-        "y": 0
+        "x": 56,
+        "y": 347
     },
     {
         "code": "MYZ009",
@@ -6080,8 +6080,8 @@
         "lat": 31.9951,
         "lon": 131.2559,
         "prefecture": "MIYAZAKIKEN",
-        "x": 54,
-        "y": 349
+        "x": 0,
+        "y": 0
     },
     {
         "code": "MYZ012",
@@ -6116,8 +6116,8 @@
         "lat": 31.7182,
         "lon": 131.0624,
         "prefecture": "MIYAZAKIKEN",
-        "x": 0,
-        "y": 0
+        "x": 50,
+        "y": 356
     },
     {
         "code": "MYZ016",
@@ -6161,8 +6161,8 @@
         "lat": 32.4557,
         "lon": 131.1472,
         "prefecture": "MIYAZAKIKEN",
-        "x": 0,
-        "y": 0
+        "x": 50,
+        "y": 338
     },
     {
         "code": "NAR001",
@@ -6503,8 +6503,8 @@
         "lat": 33.181,
         "lon": 129.7173,
         "prefecture": "NAGASAKIKEN",
-        "x": 0,
-        "y": 0
+        "x": 21,
+        "y": 322
     },
     {
         "code": "NGS005",
@@ -6512,8 +6512,8 @@
         "lat": 33.037,
         "lon": 129.9173,
         "prefecture": "NAGASAKIKEN",
-        "x": 0,
-        "y": 0
+        "x": 26,
+        "y": 324
     },
     {
         "code": "NGS006",
@@ -6548,8 +6548,8 @@
         "lat": 32.8457,
         "lon": 130.0216,
         "prefecture": "NAGASAKIKEN",
-        "x": 0,
-        "y": 0
+        "x": 28,
+        "y": 329
     },
     {
         "code": "NGS010",
@@ -6557,8 +6557,8 @@
         "lat": 32.7351,
         "lon": 129.8765,
         "prefecture": "NAGASAKIKEN",
-        "x": 0,
-        "y": 0
+        "x": 26,
+        "y": 331
     },
     {
         "code": "NGS011",
@@ -6566,8 +6566,8 @@
         "lat": 32.7843,
         "lon": 130.2023,
         "prefecture": "NAGASAKIKEN",
-        "x": 0,
-        "y": 0
+        "x": 32,
+        "y": 330
     },
     {
         "code": "NGS012",
@@ -6575,8 +6575,8 @@
         "lat": 32.7883,
         "lon": 130.3463,
         "prefecture": "NAGASAKIKEN",
-        "x": 0,
-        "y": 0
+        "x": 35,
+        "y": 330
     },
     {
         "code": "NGS013",
@@ -6593,8 +6593,8 @@
         "lat": 32.6104,
         "lon": 130.1851,
         "prefecture": "NAGASAKIKEN",
-        "x": 0,
-        "y": 0
+        "x": 32,
+        "y": 335
     },
     {
         "code": "NGS015",
@@ -6638,8 +6638,8 @@
         "lat": 32.9003,
         "lon": 129.9583,
         "prefecture": "NAGASAKIKEN",
-        "x": 0,
-        "y": 0
+        "x": 27,
+        "y": 327
     },
     {
         "code": "NGS020",
@@ -6944,8 +6944,8 @@
         "lat": 33.5691,
         "lon": 131.2675,
         "prefecture": "OITAKEN",
-        "x": 0,
-        "y": 0
+        "x": 54,
+        "y": 311
     },
     {
         "code": "OIT003",
@@ -6989,8 +6989,8 @@
         "lat": 33.4169,
         "lon": 131.6142,
         "prefecture": "OITAKEN",
-        "x": 0,
-        "y": 0
+        "x": 61,
+        "y": 315
     },
     {
         "code": "OIT008",
@@ -7007,8 +7007,8 @@
         "lat": 33.2568,
         "lon": 131.3443,
         "prefecture": "OITAKEN",
-        "x": 0,
-        "y": 0
+        "x": 55,
+        "y": 319
     },
     {
         "code": "OIT010",
@@ -7016,8 +7016,8 @@
         "lat": 33.2317,
         "lon": 131.5934,
         "prefecture": "OITAKEN",
-        "x": 0,
-        "y": 0
+        "x": 60,
+        "y": 319
     },
     {
         "code": "OIT011",
@@ -7025,8 +7025,8 @@
         "lat": 33.2468,
         "lon": 131.8816,
         "prefecture": "OITAKEN",
-        "x": 0,
-        "y": 0
+        "x": 66,
+        "y": 319
     },
     {
         "code": "OIT012",
@@ -7043,8 +7043,8 @@
         "lat": 33.0727,
         "lon": 131.5934,
         "prefecture": "OITAKEN",
-        "x": 0,
-        "y": 0
+        "x": 60,
+        "y": 323
     },
     {
         "code": "OIT014",
@@ -7052,8 +7052,8 @@
         "lat": 33.0656,
         "lon": 131.8588,
         "prefecture": "OITAKEN",
-        "x": 0,
-        "y": 0
+        "x": 66,
+        "y": 323
     },
     {
         "code": "OIT015",
@@ -7070,8 +7070,8 @@
         "lat": 32.9748,
         "lon": 131.903,
         "prefecture": "OITAKEN",
-        "x": 0,
-        "y": 0
+        "x": 68,
+        "y": 325
     },
     {
         "code": "OIT017",
@@ -7088,8 +7088,8 @@
         "lat": 32.798,
         "lon": 131.9255,
         "prefecture": "OITAKEN",
-        "x": 0,
-        "y": 0
+        "x": 67,
+        "y": 330
     },
     {
         "code": "OKN001",
@@ -7430,8 +7430,8 @@
         "lat": 33.4228,
         "lon": 129.9192,
         "prefecture": "SAGAKEN",
-        "x": 0,
-        "y": 0
+        "x": 26,
+        "y": 315
     },
     {
         "code": "SAG003",
@@ -7439,8 +7439,8 @@
         "lat": 33.3732,
         "lon": 130.2081,
         "prefecture": "SAGAKEN",
-        "x": 0,
-        "y": 0
+        "x": 31,
+        "y": 317
     },
     {
         "code": "SAG004",
@@ -7457,8 +7457,8 @@
         "lat": 33.3213,
         "lon": 130.0645,
         "prefecture": "SAGAKEN",
-        "x": 0,
-        "y": 0
+        "x": 29,
+        "y": 317
     },
     {
         "code": "SAG006",
@@ -7466,8 +7466,8 @@
         "lat": 33.1917,
         "lon": 130.0317,
         "prefecture": "SAGAKEN",
-        "x": 0,
-        "y": 0
+        "x": 28,
+        "y": 320
     },
     {
         "code": "SAG007",
@@ -7475,8 +7475,8 @@
         "lat": 33.2626,
         "lon": 130.3005,
         "prefecture": "SAGAKEN",
-        "x": 0,
-        "y": 0
+        "x": 34,
+        "y": 319
     },
     {
         "code": "SAG008",
@@ -7484,8 +7484,8 @@
         "lat": 33.1041,
         "lon": 130.0998,
         "prefecture": "SAGAKEN",
-        "x": 0,
-        "y": 0
+        "x": 30,
+        "y": 323
     },
     {
         "code": "SIG001",
@@ -10364,8 +10364,8 @@
         "lat": 33.8849,
         "lon": 130.9798,
         "prefecture": "FUKUOKAKEN",
-        "x": 0,
-        "y": 0
+        "x": 48,
+        "y": 303
     },
     {
         "code": "FKOH02",
@@ -10373,8 +10373,8 @@
         "lat": 33.6963,
         "lon": 130.5963,
         "prefecture": "FUKUOKAKEN",
-        "x": 0,
-        "y": 0
+        "x": 40,
+        "y": 307
     },
     {
         "code": "FKOH03",
@@ -10382,8 +10382,8 @@
         "lat": 33.5608,
         "lon": 130.5499,
         "prefecture": "FUKUOKAKEN",
-        "x": 0,
-        "y": 0
+        "x": 39,
+        "y": 311
     },
     {
         "code": "FKOH04",
@@ -10391,8 +10391,8 @@
         "lat": 33.5512,
         "lon": 130.7451,
         "prefecture": "FUKUOKAKEN",
-        "x": 0,
-        "y": 0
+        "x": 43,
+        "y": 311
     },
     {
         "code": "FKOH05",
@@ -10400,8 +10400,8 @@
         "lat": 33.5293,
         "lon": 130.9503,
         "prefecture": "FUKUOKAKEN",
-        "x": 0,
-        "y": 0
+        "x": 47,
+        "y": 312
     },
     {
         "code": "FKOH06",
@@ -10409,8 +10409,8 @@
         "lat": 33.5925,
         "lon": 131.1348,
         "prefecture": "FUKUOKAKEN",
-        "x": 0,
-        "y": 0
+        "x": 51,
+        "y": 310
     },
     {
         "code": "FKOH07",
@@ -10418,8 +10418,8 @@
         "lat": 33.3678,
         "lon": 130.6354,
         "prefecture": "FUKUOKAKEN",
-        "x": 0,
-        "y": 0
+        "x": 42,
+        "y": 317
     },
     {
         "code": "FKOH08",
@@ -10427,8 +10427,8 @@
         "lat": 33.4654,
         "lon": 130.8285,
         "prefecture": "FUKUOKAKEN",
-        "x": 0,
-        "y": 0
+        "x": 45,
+        "y": 313
     },
     {
         "code": "FKOH09",
@@ -10436,8 +10436,8 @@
         "lat": 33.8501,
         "lon": 130.5432,
         "prefecture": "FUKUOKAKEN",
-        "x": 0,
-        "y": 0
+        "x": 39,
+        "y": 304
     },
     {
         "code": "FKOH10",
@@ -10445,8 +10445,8 @@
         "lat": 33.2891,
         "lon": 130.817,
         "prefecture": "FUKUOKAKEN",
-        "x": 0,
-        "y": 0
+        "x": 45,
+        "y": 318
     },
     {
         "code": "FKSH01",
@@ -11930,8 +11930,8 @@
         "lat": 32.1554,
         "lon": 130.1191,
         "prefecture": "KAGOSHIMAKEN",
-        "x": 0,
-        "y": 0
+        "x": 30,
+        "y": 346
     },
     {
         "code": "KGSH02",
@@ -11939,8 +11939,8 @@
         "lat": 31.994,
         "lon": 130.2077,
         "prefecture": "KAGOSHIMAKEN",
-        "x": 0,
-        "y": 0
+        "x": 32,
+        "y": 350
     },
     {
         "code": "KGSH03",
@@ -11948,8 +11948,8 @@
         "lat": 31.9812,
         "lon": 130.4438,
         "prefecture": "KAGOSHIMAKEN",
-        "x": 0,
-        "y": 0
+        "x": 37,
+        "y": 350
     },
     {
         "code": "KGSH04",
@@ -11985,7 +11985,7 @@
         "lon": 130.6149,
         "prefecture": "KAGOSHIMAKEN",
         "x": 40,
-        "y": 357
+        "y": 356
     },
     {
         "code": "KGSH08",
@@ -12227,8 +12227,8 @@
         "lat": 33.1089,
         "lon": 130.6949,
         "prefecture": "KUMAMOTOKEN",
-        "x": 0,
-        "y": 0
+        "x": 42,
+        "y": 322
     },
     {
         "code": "KMMH02",
@@ -12236,8 +12236,8 @@
         "lat": 33.122,
         "lon": 131.0629,
         "prefecture": "KUMAMOTOKEN",
-        "x": 0,
-        "y": 0
+        "x": 50,
+        "y": 322
     },
     {
         "code": "KMMH03",
@@ -12245,8 +12245,8 @@
         "lat": 32.9984,
         "lon": 130.8301,
         "prefecture": "KUMAMOTOKEN",
-        "x": 0,
-        "y": 0
+        "x": 45,
+        "y": 325
     },
     {
         "code": "KMMH04",
@@ -12263,8 +12263,8 @@
         "lat": 32.9553,
         "lon": 131.2207,
         "prefecture": "KUMAMOTOKEN",
-        "x": 0,
-        "y": 0
+        "x": 53,
+        "y": 326
     },
     {
         "code": "KMMH06",
@@ -12272,8 +12272,8 @@
         "lat": 32.8114,
         "lon": 131.101,
         "prefecture": "KUMAMOTOKEN",
-        "x": 0,
-        "y": 0
+        "x": 50,
+        "y": 330
     },
     {
         "code": "KMMH07",
@@ -12281,8 +12281,8 @@
         "lat": 32.6234,
         "lon": 130.5584,
         "prefecture": "KUMAMOTOKEN",
-        "x": 0,
-        "y": 0
+        "x": 39,
+        "y": 334
     },
     {
         "code": "KMMH08",
@@ -12290,8 +12290,8 @@
         "lat": 32.6501,
         "lon": 131.0251,
         "prefecture": "KUMAMOTOKEN",
-        "x": 0,
-        "y": 0
+        "x": 49,
+        "y": 333
     },
     {
         "code": "KMMH09",
@@ -12299,8 +12299,8 @@
         "lat": 32.4901,
         "lon": 130.9046,
         "prefecture": "KUMAMOTOKEN",
-        "x": 0,
-        "y": 0
+        "x": 46,
+        "y": 337
     },
     {
         "code": "KMMH10",
@@ -12308,8 +12308,8 @@
         "lat": 32.3151,
         "lon": 130.1811,
         "prefecture": "KUMAMOTOKEN",
-        "x": 0,
-        "y": 0
+        "x": 32,
+        "y": 342
     },
     {
         "code": "KMMH11",
@@ -12317,8 +12317,8 @@
         "lat": 32.2918,
         "lon": 130.5777,
         "prefecture": "KUMAMOTOKEN",
-        "x": 0,
-        "y": 0
+        "x": 41,
+        "y": 341
     },
     {
         "code": "KMMH12",
@@ -12326,8 +12326,8 @@
         "lat": 32.2054,
         "lon": 130.7371,
         "prefecture": "KUMAMOTOKEN",
-        "x": 0,
-        "y": 0
+        "x": 42,
+        "y": 345
     },
     {
         "code": "KMMH13",
@@ -12335,8 +12335,8 @@
         "lat": 32.2209,
         "lon": 130.9096,
         "prefecture": "KUMAMOTOKEN",
-        "x": 0,
-        "y": 0
+        "x": 46,
+        "y": 345
     },
     {
         "code": "KMMH14",
@@ -12344,8 +12344,8 @@
         "lat": 32.6345,
         "lon": 130.7521,
         "prefecture": "KUMAMOTOKEN",
-        "x": 0,
-        "y": 0
+        "x": 43,
+        "y": 334
     },
     {
         "code": "KMMH15",
@@ -12353,8 +12353,8 @@
         "lat": 32.1704,
         "lon": 130.3647,
         "prefecture": "KUMAMOTOKEN",
-        "x": 0,
-        "y": 0
+        "x": 35,
+        "y": 345
     },
     {
         "code": "KMMH16",
@@ -12362,8 +12362,8 @@
         "lat": 32.7967,
         "lon": 130.8199,
         "prefecture": "KUMAMOTOKEN",
-        "x": 0,
-        "y": 0
+        "x": 45,
+        "y": 330
     },
     {
         "code": "KMMH17",
@@ -12371,8 +12371,8 @@
         "lat": 32.9873,
         "lon": 130.5608,
         "prefecture": "KUMAMOTOKEN",
-        "x": 0,
-        "y": 0
+        "x": 39,
+        "y": 325
     },
     {
         "code": "KMMH18",
@@ -12380,8 +12380,8 @@
         "lat": 33.0031,
         "lon": 131.0071,
         "prefecture": "KUMAMOTOKEN",
-        "x": 0,
-        "y": 0
+        "x": 48,
+        "y": 325
     },
     {
         "code": "KNGH10",
@@ -12965,8 +12965,8 @@
         "lat": 32.6972,
         "lon": 131.6829,
         "prefecture": "MIYAZAKIKEN",
-        "x": 0,
-        "y": 0
+        "x": 62,
+        "y": 332
     },
     {
         "code": "MYZH03",
@@ -12983,8 +12983,8 @@
         "lat": 32.5181,
         "lon": 131.3349,
         "prefecture": "MIYAZAKIKEN",
-        "x": 0,
-        "y": 0
+        "x": 55,
+        "y": 337
     },
     {
         "code": "MYZH05",
@@ -12992,8 +12992,8 @@
         "lat": 32.347,
         "lon": 131.2668,
         "prefecture": "MIYAZAKIKEN",
-        "x": 0,
-        "y": 0
+        "x": 53,
+        "y": 342
     },
     {
         "code": "MYZH06",
@@ -13001,8 +13001,8 @@
         "lat": 32.3607,
         "lon": 131.4643,
         "prefecture": "MIYAZAKIKEN",
-        "x": 0,
-        "y": 0
+        "x": 57,
+        "y": 342
     },
     {
         "code": "MYZH07",
@@ -13010,8 +13010,8 @@
         "lat": 32.1987,
         "lon": 131.1946,
         "prefecture": "MIYAZAKIKEN",
-        "x": 0,
-        "y": 0
+        "x": 52,
+        "y": 345
     },
     {
         "code": "MYZH08",
@@ -13019,8 +13019,8 @@
         "lat": 32.2132,
         "lon": 131.5309,
         "prefecture": "MIYAZAKIKEN",
-        "x": 0,
-        "y": 0
+        "x": 59,
+        "y": 344
     },
     {
         "code": "MYZH09",
@@ -13037,8 +13037,8 @@
         "lat": 32.0215,
         "lon": 131.29,
         "prefecture": "MIYAZAKIKEN",
-        "x": 56,
-        "y": 347
+        "x": 0,
+        "y": 0
     },
     {
         "code": "MYZH11",
@@ -13064,8 +13064,8 @@
         "lat": 31.7301,
         "lon": 131.0791,
         "prefecture": "MIYAZAKIKEN",
-        "x": 50,
-        "y": 356
+        "x": 0,
+        "y": 0
     },
     {
         "code": "MYZH14",
@@ -13082,8 +13082,8 @@
         "lat": 32.3654,
         "lon": 131.5893,
         "prefecture": "MIYAZAKIKEN",
-        "x": 0,
-        "y": 0
+        "x": 59,
+        "y": 339
     },
     {
         "code": "MYZH16",
@@ -13091,8 +13091,8 @@
         "lat": 32.506,
         "lon": 131.6958,
         "prefecture": "MIYAZAKIKEN",
-        "x": 0,
-        "y": 0
+        "x": 62,
+        "y": 337
     },
     {
         "code": "NARH01",
@@ -13469,8 +13469,8 @@
         "lat": 33.2122,
         "lon": 129.7652,
         "prefecture": "NAGASAKIKEN",
-        "x": 0,
-        "y": 0
+        "x": 22,
+        "y": 319
     },
     {
         "code": "NGSH03",
@@ -13478,8 +13478,8 @@
         "lat": 33.1256,
         "lon": 129.8102,
         "prefecture": "NAGASAKIKEN",
-        "x": 0,
-        "y": 0
+        "x": 24,
+        "y": 322
     },
     {
         "code": "NGSH04",
@@ -13487,8 +13487,8 @@
         "lat": 32.9553,
         "lon": 129.8026,
         "prefecture": "NAGASAKIKEN",
-        "x": 0,
-        "y": 0
+        "x": 24,
+        "y": 326
     },
     {
         "code": "NGSH05",
@@ -13496,8 +13496,8 @@
         "lat": 32.9103,
         "lon": 130.1408,
         "prefecture": "NAGASAKIKEN",
-        "x": 0,
-        "y": 0
+        "x": 31,
+        "y": 327
     },
     {
         "code": "NGSH06",
@@ -13730,8 +13730,8 @@
         "lat": 33.4122,
         "lon": 131.0326,
         "prefecture": "OITAKEN",
-        "x": 0,
-        "y": 0
+        "x": 49,
+        "y": 315
     },
     {
         "code": "OITH02",
@@ -13739,8 +13739,8 @@
         "lat": 33.4581,
         "lon": 131.4429,
         "prefecture": "OITAKEN",
-        "x": 0,
-        "y": 0
+        "x": 57,
+        "y": 314
     },
     {
         "code": "OITH03",
@@ -13748,8 +13748,8 @@
         "lat": 33.4736,
         "lon": 131.6856,
         "prefecture": "OITAKEN",
-        "x": 0,
-        "y": 0
+        "x": 62,
+        "y": 313
     },
     {
         "code": "OITH04",
@@ -13757,8 +13757,8 @@
         "lat": 33.1306,
         "lon": 131.3473,
         "prefecture": "OITAKEN",
-        "x": 0,
-        "y": 0
+        "x": 55,
+        "y": 322
     },
     {
         "code": "OITH05",
@@ -13766,8 +13766,8 @@
         "lat": 33.1525,
         "lon": 131.542,
         "prefecture": "OITAKEN",
-        "x": 0,
-        "y": 0
+        "x": 59,
+        "y": 321
     },
     {
         "code": "OITH06",
@@ -13775,8 +13775,8 @@
         "lat": 32.9726,
         "lon": 131.3984,
         "prefecture": "OITAKEN",
-        "x": 0,
-        "y": 0
+        "x": 56,
+        "y": 326
     },
     {
         "code": "OITH07",
@@ -13784,8 +13784,8 @@
         "lat": 32.987,
         "lon": 131.5881,
         "prefecture": "OITAKEN",
-        "x": 0,
-        "y": 0
+        "x": 60,
+        "y": 325
     },
     {
         "code": "OITH08",
@@ -13793,8 +13793,8 @@
         "lat": 32.8392,
         "lon": 131.5357,
         "prefecture": "OITAKEN",
-        "x": 0,
-        "y": 0
+        "x": 59,
+        "y": 329
     },
     {
         "code": "OITH09",
@@ -13802,8 +13802,8 @@
         "lat": 32.8486,
         "lon": 131.6786,
         "prefecture": "OITAKEN",
-        "x": 0,
-        "y": 0
+        "x": 62,
+        "y": 329
     },
     {
         "code": "OITH10",
@@ -13811,8 +13811,8 @@
         "lat": 32.9278,
         "lon": 131.8695,
         "prefecture": "OITAKEN",
-        "x": 0,
-        "y": 0
+        "x": 66,
+        "y": 327
     },
     {
         "code": "OITH11",
@@ -13820,8 +13820,8 @@
         "lat": 33.2844,
         "lon": 131.2118,
         "prefecture": "OITAKEN",
-        "x": 0,
-        "y": 0
+        "x": 53,
+        "y": 318
     },
     {
         "code": "OKYH01",
@@ -14063,8 +14063,8 @@
         "lat": 33.508,
         "lon": 129.8877,
         "prefecture": "SAGAKEN",
-        "x": 0,
-        "y": 0
+        "x": 26,
+        "y": 312
     },
     {
         "code": "SAGH02",
@@ -14072,8 +14072,8 @@
         "lat": 33.2656,
         "lon": 129.8798,
         "prefecture": "SAGAKEN",
-        "x": 0,
-        "y": 0
+        "x": 26,
+        "y": 319
     },
     {
         "code": "SAGH03",
@@ -14081,8 +14081,8 @@
         "lat": 33.4098,
         "lon": 130.2329,
         "prefecture": "SAGAKEN",
-        "x": 0,
-        "y": 0
+        "x": 34,
+        "y": 314
     },
     {
         "code": "SAGH04",
@@ -14090,8 +14090,8 @@
         "lat": 33.3654,
         "lon": 130.4046,
         "prefecture": "SAGAKEN",
-        "x": 0,
-        "y": 0
+        "x": 36,
+        "y": 316
     },
     {
         "code": "SAGH05",
@@ -14099,8 +14099,8 @@
         "lat": 33.1806,
         "lon": 130.1046,
         "prefecture": "SAGAKEN",
-        "x": 0,
-        "y": 0
+        "x": 31,
+        "y": 320
     },
     {
         "code": "SBSH01",
