@@ -135,26 +135,20 @@ export const useEEWMap = () => {
 
 		map.addControl(new maplibregl.AttributionControl({ compact: true }), "bottom-right");
 
-		// [변경] 마우스 좌표 컨트롤을 'bottom-left'에 추가
-		// 가장 먼저 추가하면 가장 아래쪽에 깔리고, 나중에 추가하면 그 위에 쌓임
-		// EEWControl(모니터)보다 아래 혹은 위에 두고 싶은지에 따라 순서 조정 가능.
-		// 여기서는 좌표를 가장 하단 구석에 두기 위해 먼저 추가
-		map.addControl(new MouseCoordinatesControl(), "bottom-left");
-
 		// [기존] EEW 모니터 컨트롤 (좌표 위에 쌓임)
 		map.addControl(new EEWControl(), "bottom-left");
 
 		// [기존] 상단 컨트롤들
 		map.addControl(new SystemStatusControl(), "top-right");
-
+		/*
 		map.addControl(
 			new maplibregl.NavigationControl({
 				showZoom: true,
 				showCompass: false,
 			}),
-			"bottom-right"
+			"top-right"
 		);
-
+		*/
 		map.dragRotate.disable();
 		map.touchZoomRotate.disableRotation();
 		map.touchPitch.disable();
@@ -165,7 +159,13 @@ export const useEEWMap = () => {
 			showUserLocation: false,
 			fitBoundsOptions: { maxZoom: 4.75 },
 		});
-		map.addControl(geolocate, "bottom-right");
+		map.addControl(geolocate, "top-right");
+
+		// [변경] 마우스 좌표 컨트롤을 'bottom-left'에 추가
+		// 가장 먼저 추가하면 가장 아래쪽에 깔리고, 나중에 추가하면 그 위에 쌓임
+		// EEWControl(모니터)보다 아래 혹은 위에 두고 싶은지에 따라 순서 조정 가능.
+		// 여기서는 좌표를 가장 하단 구석에 두기 위해 먼저 추가
+		map.addControl(new MouseCoordinatesControl(), "bottom-right");
 
 		geolocate.on("geolocate", (e) => {
 			const lng = e.coords.longitude;
