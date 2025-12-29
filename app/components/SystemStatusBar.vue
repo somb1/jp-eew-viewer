@@ -82,9 +82,7 @@
 				v-else-if="!eewData"
 				class="flex items-center justify-center rounded-lg border border-gray-700 bg-gray-900/80 p-3 text-gray-300 backdrop-blur shadow-lg"
 			>
-				<div
-					class="mr-3 h-2 w-2 rounded-full bg-gray-400"
-				></div>
+				<div class="mr-3 h-2 w-2 rounded-full bg-gray-400"></div>
 				<span class="text-sm font-semibold tracking-wide"
 					>데이터 수신 중...</span
 				>

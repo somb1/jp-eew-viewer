@@ -133,7 +133,10 @@ export const useEEWMap = () => {
 			attributionControl: false,
 		});
 
-		map.addControl(new maplibregl.AttributionControl({ compact: true }), "bottom-right");
+		map.addControl(
+			new maplibregl.AttributionControl({ compact: true }),
+			"bottom-right"
+		);
 
 		// [기존] EEW 모니터 컨트롤 (좌표 위에 쌓임)
 		map.addControl(new EEWControl(), "bottom-left");
