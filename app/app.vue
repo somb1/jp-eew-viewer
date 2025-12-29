@@ -1,6 +1,7 @@
 <template>
 	<UApp>
 		<Analytics/>
+		<VitePwaManifest />
 		<AppHeader />
 		<NuxtPage />
 	</UApp>

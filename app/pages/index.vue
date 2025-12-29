@@ -74,6 +74,4 @@ watch(stationPointsData, (newData) => {
 	background-color: #222;
 	overflow: hidden;
 }
-
-/* [제거됨] .mouse-info CSS 삭제 */
 </style>
