@@ -58,7 +58,7 @@ class MouseCoordinatesControl implements maplibregl.IControl {
 		this.container.style.display = "none";
 
 		// 좌측 하단 구석에 딱 붙지 않게 약간의 여백 (Tailwind m-2 등 사용 가능하지만 컨트롤 특성상 style이 안전)
-		this.container.style.margin = "0 0 8px 8px";
+		this.container.style.margin = "8px 8px 8px 8px";
 	}
 
 	onAdd(map: maplibregl.Map) {
@@ -134,12 +134,9 @@ export const useEEWMap = () => {
 		});
 
 		map.addControl(
-			new maplibregl.AttributionControl({ compact: true }),
+			new maplibregl.AttributionControl({ compact: true, }),
 			"bottom-right"
 		);
-
-		// [기존] EEW 모니터 컨트롤 (좌표 위에 쌓임)
-		map.addControl(new EEWControl(), "bottom-left");
 
 		// [기존] 상단 컨트롤들
 		map.addControl(new SystemStatusControl(), "top-right");
@@ -168,7 +165,7 @@ export const useEEWMap = () => {
 		// 가장 먼저 추가하면 가장 아래쪽에 깔리고, 나중에 추가하면 그 위에 쌓임
 		// EEWControl(모니터)보다 아래 혹은 위에 두고 싶은지에 따라 순서 조정 가능.
 		// 여기서는 좌표를 가장 하단 구석에 두기 위해 먼저 추가
-		map.addControl(new MouseCoordinatesControl(), "bottom-right");
+		map.addControl(new MouseCoordinatesControl(), "top-right");
 
 		geolocate.on("geolocate", (e) => {
 			const lng = e.coords.longitude;
