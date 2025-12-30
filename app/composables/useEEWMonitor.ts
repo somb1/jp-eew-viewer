@@ -1,3 +1,6 @@
+import { ref } from "vue";
+// import ... (필요한 import 유지)
+
 export const useEEWMonitor = () => {
 	// 상태 변수
 	const eewData = ref<any>(null);
@@ -11,6 +14,23 @@ export const useEEWMonitor = () => {
 	// 내부 변수
 	let timerId: any = null;
 	let simulatedTime: Date | null = null;
+
+	// [추가] 중복 요청 방지용 플래그
+	let isFetching = false;
+
+	// [헬퍼] request_time 문자열(YYYYMMDDHHmmss)을 Date 객체로 변환
+	const parseRequestTime = (timeStr: string): Date | null => {
+		if (!timeStr || timeStr.length !== 14) return null;
+
+		const year = parseInt(timeStr.substring(0, 4));
+		const month = parseInt(timeStr.substring(4, 6)) - 1;
+		const day = parseInt(timeStr.substring(6, 8));
+		const hour = parseInt(timeStr.substring(8, 10));
+		const min = parseInt(timeStr.substring(10, 12));
+		const sec = parseInt(timeStr.substring(12, 14));
+
+		return new Date(year, month, day, hour, min, sec);
+	};
 
 	// [로직 1] 서버 시간 동기화
 	const syncFromServer = async (): Promise<boolean> => {
@@ -39,18 +59,23 @@ export const useEEWMonitor = () => {
 		timerId = setInterval(async () => {
 			if (!simulatedTime) return;
 
-			// 1초 증가
+			// 1. 내부 시간은 네트워크 상태와 무관하게 1초씩 계속 흘러가야 합니다.
 			simulatedTime.setSeconds(simulatedTime.getSeconds() + 1);
 
-			// UI 업데이트
+			// [핵심] 이미 데이터를 가져오는 중이라면 이번 틱(Tick)은 건너뜁니다.
+			if (isFetching) {
+				console.warn(
+					"Skipping request: Previous request is still pending."
+				);
+				return;
+			}
+
+			// 2. 요청 시작 전 플래그 잠금
+			isFetching = true;
+
 			const timeParam = formatDateToParam(simulatedTime);
-			currentDisplayTime.value = formatDateToDisplay(simulatedTime);
 
 			try {
-				// ====================================================
-				// [수정] 통합된 API 요청 (EEW + Points)
-				// 타입/소스는 기본값(acmap/s)을 쓰거나 필요시 쿼리스트링에 추가
-				// ====================================================
 				const response = await fetch(
 					`/api/eew?time=${timeParam}&type=acmap&source=s`
 				).then((r) => {
@@ -63,10 +88,14 @@ export const useEEWMonitor = () => {
 					eewData.value = response.eew;
 					connectionStatus.value = "live";
 					lastErrorMessage.value = null;
+
+					const reqTimeStr = response.eew.request_time;
+					const reqDate = parseRequestTime(reqTimeStr);
+
+					if (reqDate) {
+						currentDisplayTime.value = formatDateToDisplay(reqDate);
+					}
 				} else {
-					// EEW 데이터가 null이면 연결 문제일 가능성 높음
-					// 하지만 404가 아니라 내부 파싱 에러 등으로 null일 수 있으므로 상황에 따라 처리
-					// 여기서는 기존 값 유지 또는 경고
 					console.warn("EEW data is empty");
 				}
 
@@ -84,11 +113,13 @@ export const useEEWMonitor = () => {
 				connectionStatus.value = "error";
 				lastErrorMessage.value = "Connection Lost";
 
-				// 에러 시 포인트 데이터 비우기 (선택 사항)
 				stationPointsData.value = {
 					type: "FeatureCollection",
 					features: [],
 				};
+			} finally {
+				// [핵심] 성공하든 실패하든 요청이 끝나면 플래그 해제
+				isFetching = false;
 			}
 		}, 1000);
 	};
@@ -98,6 +129,8 @@ export const useEEWMonitor = () => {
 		if (connectionStatus.value === "syncing") return;
 
 		if (timerId) clearInterval(timerId);
+		// 수동 동기화 시에는 fetching 상태 초기화
+		isFetching = false;
 		connectionStatus.value = "syncing";
 
 		const success = await syncFromServer();
@@ -108,6 +141,7 @@ export const useEEWMonitor = () => {
 
 	const initEEW = async () => {
 		connectionStatus.value = "syncing";
+		isFetching = false; // 초기화 시 플래그 리셋
 		const success = await syncFromServer();
 		if (success) {
 			startLoop();
@@ -116,6 +150,7 @@ export const useEEWMonitor = () => {
 
 	const stopEEW = () => {
 		if (timerId) clearInterval(timerId);
+		isFetching = false;
 	};
 
 	return {
