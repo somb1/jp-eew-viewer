@@ -5,21 +5,6 @@ import { Jimp } from "jimp";
 import stationsS from "~/assets/stations_surface.json";
 import stationsB from "~/assets/stations_borehole.json";
 
-// 검증용 상수
-const VALID_TYPES = [
-	"jma",
-	"acmap",
-	"vcmap",
-	"dcmap",
-	"rsp0125",
-	"rsp0250",
-	"rsp0500",
-	"rsp1000",
-	"rsp2000",
-	"rsp4000",
-];
-const VALID_SOURCES = ["s", "b"];
-
 // 기존 EEW 응답 인터페이스
 interface EEWResponse {
 	result: { status: string; message: string; is_auth: boolean };
@@ -28,11 +13,11 @@ interface EEWResponse {
 	request_time: string;
 	region_name: string;
 	longitude: string;
-	is_cancel: string;
+	is_cancel: boolean;
 	depth: string;
 	calcintensity: string;
-	is_final: string;
-	is_training: string;
+	is_final: boolean;
+	is_training: boolean;
 	latitude: string;
 	origin_time: string;
 	security: { realm: string; hash: string };
@@ -42,8 +27,9 @@ interface EEWResponse {
 	report_id: string;
 }
 
-// 통합 응답 인터페이스
+// [수정] 통합 응답 인터페이스: timestamp 필드 추가
 interface CombinedResponse {
+	timestamp: string; // 클라이언트가 요청한 시간(YYYYMMDDHHmmss)
 	eew: EEWResponse | null;
 	points: {
 		type: "FeatureCollection";
@@ -59,6 +45,7 @@ export default defineEventHandler(async (event): Promise<CombinedResponse> => {
 	const type = (query.type as string) || "acmap";
 	const source = (query.source as string) || "s";
 
+	// 필수 파라미터 검증
 	if (!time || time.length !== 14) {
 		throw createError({
 			statusCode: 400,
@@ -105,7 +92,7 @@ export default defineEventHandler(async (event): Promise<CombinedResponse> => {
 	// (2) 이미지 가져오기 및 GeoJSON 변환
 	const fetchPoints = async () => {
 		try {
-			// 소스에 따른 관측소 선택
+			// 소스에 따른 관측소 선택 (s: 지표, b: 시추공)
 			const stations = source === "b" ? stationsB : stationsS;
 
 			const imageBuffer = await $fetch<ArrayBuffer>(imgUrl, {
@@ -122,14 +109,17 @@ export default defineEventHandler(async (event): Promise<CombinedResponse> => {
 				},
 			});
 
+			// Jimp로 이미지 파싱
 			const image = await Jimp.read(Buffer.from(imageBuffer));
 
+			// 관측소 좌표와 픽셀 매칭
 			const features = stations
 				.filter((s: any) => s.x !== 0 && s.y !== 0)
 				.reduce((acc: any[], s: any) => {
 					const colorInt = image.getPixelColor(s.x, s.y);
 					const a = colorInt & 0xff;
 
+					// 투명(데이터 없음)이면 스킵
 					if (a === 0) return acc;
 
 					const r = (colorInt >>> 24) & 0xff;
@@ -172,10 +162,9 @@ export default defineEventHandler(async (event): Promise<CombinedResponse> => {
 		fetchPoints(),
 	]);
 
-	// EEW 데이터조차 실패했다면 에러로 간주할 수도 있고, null로 보낼 수도 있음.
-	// 여기서는 null로 보내 클라이언트가 처리하게 함.
-
+	// [수정] timestamp 필드에 요청받은 time을 포함하여 반환
 	return {
+		timestamp: time,
 		eew: eewData,
 		points: pointsData as any,
 	};

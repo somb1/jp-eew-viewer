@@ -232,11 +232,13 @@ const isEmptyResponse = computed(() => {
 });
 
 const isCancel = computed(() => {
-	return props.eewData?.is_cancel === "true";
+	const val = props.eewData?.is_cancel;
+	return val === "true" || val === true;
 });
 
 const isFinal = computed(() => {
-	return props.eewData?.is_final === "true";
+	const val = props.eewData?.is_final;
+	return val === "true" || val === true;
 });
 
 const displayIntensity = computed(() => {
@@ -247,7 +249,7 @@ const displayIntensity = computed(() => {
 
 const formatOriginTime = (rawTime: string) => {
 	if (!rawTime || rawTime.length < 14) return rawTime;
-	const Y = rawTime.substring(0, 4);
+	const Y = rawTime.substring(0, 4);	
 	const M = rawTime.substring(4, 6);
 	const D = rawTime.substring(6, 8);
 	const h = rawTime.substring(8, 10);
