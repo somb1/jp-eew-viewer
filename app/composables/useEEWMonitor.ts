@@ -17,6 +17,10 @@ export const useEEWMonitor = () => {
 	// [변경] timerId 대신 worker 변수 사용
 	// let timerId: any = null; (삭제 또는 주석)
 	let worker: Worker | null = null;
+
+	// [설정] 허용 가능한 최대 시간 오차 (ms) - 3초 이상 차이나면 재동기화
+    const MAX_TIME_DRIFT = 3000;
+
 	let simulatedTime: Date | null = null;
 	let isFetching = false;
 
@@ -122,6 +126,20 @@ export const useEEWMonitor = () => {
 			// ----- 기존 setInterval 내부 로직을 여기에 그대로 넣습니다 -----
 			if (!simulatedTime) return;
 
+			// [핵심 1] 워커가 보낸 신호를 처리할 때마다 '시간 검증' 수행
+            // 이유: iOS에서 백그라운드 후 복귀 시, 워커가 밀린 틱을 한꺼번에 보내거나
+            // 멈췄던 시점부터 다시 시작할 수 있음. 이때 실제 시간과 비교해야 함.
+            const now = new Date();
+            const drift = now.getTime() - simulatedTime.getTime();
+
+            // 시뮬레이션 시간이 실제 시간보다 너무 뒤처져 있다면 (3초 이상)
+            // 즉시 루프를 멈추고 재동기화 시도
+            if (Math.abs(drift) > MAX_TIME_DRIFT) {
+                console.warn(`[Time Drift Detected] Drift: ${drift}ms. Resyncing...`);
+                handleManualSync(); // 재동기화 함수 호출
+                return; // 이번 틱은 무시하고 종료
+            }
+
 			// 내부 시간 증가
 			simulatedTime.setSeconds(simulatedTime.getSeconds() + 1);
 
@@ -220,13 +238,15 @@ export const useEEWMonitor = () => {
         isFetching = false;
     };
 
-    // [변경] 수동 동기화 핸들러
     const handleManualSync = async () => {
+        // 이미 싱크 중이면 중복 실행 방지
         if (connectionStatus.value === "syncing") return;
-        stopEEW(); // 기존 타이머/워커 정리
         
+        stopEEW(); // 기존 워커 확실히 종료
         isFetching = false;
         connectionStatus.value = "syncing";
+        
+        console.log("Starting manual sync...");
         const success = await syncFromServer();
         if (success) {
             startLoop();
@@ -242,14 +262,39 @@ export const useEEWMonitor = () => {
 		}
 	};
 
+	const visibility = useDocumentVisibility();
+
+	const onPageShow = (event: PageTransitionEvent) => {
+        // persisted가 true면 캐시에서 복원된 것임 (iOS 자주 발생)
+        if (event.persisted || document.visibilityState === 'visible') {
+            checkAndSync();
+        }
+    };
+
+    const checkAndSync = () => {
+        if (!simulatedTime) {
+            handleManualSync();
+            return;
+        }
+        const now = new Date();
+        const diff = now.getTime() - simulatedTime.getTime();
+        
+        if (Math.abs(diff) > MAX_TIME_DRIFT) {
+            console.log(`[App Resumed] Significant drift (${diff}ms). Resyncing.`);
+            handleManualSync();
+        }
+    };
+
 	// 마운트 시 현재 권한 상태 확인
 	onMounted(() => {
 		checkNotificationPermission();
+		window.addEventListener('pageshow', onPageShow);
 	});
 
 	// 컴포넌트 언마운트 시 워커 정리 (안전장치)
     onBeforeUnmount(() => {
         stopEEW();
+		window.removeEventListener('pageshow', onPageShow);
     });
 
 	return {
@@ -263,5 +308,6 @@ export const useEEWMonitor = () => {
 		stopEEW,
 		requestNotificationPermission,
 		notificationPermission,
+		visibility,
 	};
 };

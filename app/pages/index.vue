@@ -86,31 +86,16 @@ watch(isDark, (newVal) => {
 
 // 화면 가시성 변경 시 재동기화
 const visibility = useDocumentVisibility();
-// [변경] 스마트 재동기화 로직
-// Web Worker가 백그라운드에서 잘 돌았다면 재동기화 하지 않고,
-// 절전 모드 등으로 인해 시간이 3초 이상 틀어졌을 때만 재동기화 함
-watch(visibility, (current, previous) => {
-    if (current === "visible" && previous === "hidden") {
-        if (!currentDisplayTime.value) {
-            handleManualSync();
-            return;
-        }
-
-        const now = new Date();
-        // currentDisplayTime은 "YYYY/MM/DD HH:mm:ss" 형식이므로 Date 객체로 변환
-        const lastDisplayed = new Date(currentDisplayTime.value);
-
-        // 시간 차이 계산 (밀리초 단위)
-        const diff = now.getTime() - lastDisplayed.getTime();
-
-        // 3000ms(3초) 이상 차이가 나면 워커가 멈췄던 것으로 간주하고 재동기화
-        // (네트워크 딜레이 등을 고려해 여유 있게 3~5초 정도로 잡음)
-        if (Math.abs(diff) > 3000) {
-            console.log("Time drifted significantly. Resyncing...", diff);
-            handleManualSync();
-        } else {
-            console.log("Worker kept time accurately. Skipping sync.");
-        }
+watch(visibility, (current) => {
+    // 화면이 켜졌을 때, 시간 차이가 크면 useEEWMonitor 내부 로직에 의해
+    // 다음 틱(tick) 혹은 pageshow 이벤트에서 처리되겠지만,
+    // 즉각적인 반응을 위해 여기서도 호출 가능
+    if (current === "visible") {
+        // handleManualSync 내부에서 어차피 상태(syncing)를 체크하므로 안전함
+        // 강제로 호출해도 되지만, 위 useEEWMonitor의 drift 체크 로직에 맡기는 것이 더 깔끔함.
+        
+        // 굳이 명시적으로 부르고 싶다면:
+        // handleManualSync(); 
     }
 });
 
