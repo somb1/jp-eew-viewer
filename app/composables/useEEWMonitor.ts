@@ -5,6 +5,12 @@ export const useEEWMonitor = () => {
 	const connectionStatus = ref<"init" | "syncing" | "live" | "error">("init");
 	const lastErrorMessage = ref<string | null>(null);
 
+	// [NEW] 마지막 지진 식별을 위한 변수
+	const lastEventId = ref<string | null>(null);
+
+	// [NEW] Nuxt UI Toast 사용
+	const toast = useToast();
+
 	// 포인트 데이터 상태
 	const stationPointsData = ref<any>(null);
 
@@ -12,6 +18,55 @@ export const useEEWMonitor = () => {
 	let timerId: any = null;
 	let simulatedTime: Date | null = null;
 	let isFetching = false;
+
+	// [NEW] 알림 권한 상태 저장 (기본값: 지원하지 않거나 아직 모름)
+	const notificationPermission = ref<NotificationPermission>("default");
+
+	// [NEW] 권한 상태 확인 함수
+	const checkNotificationPermission = () => {
+		if (typeof Notification !== "undefined") {
+			notificationPermission.value = Notification.permission;
+		}
+	};
+
+	// [NEW] 알림 발송 함수
+	const sendNotification = (eew: any) => {
+		const title = `[지진 속보] ${eew.region_name} 규모 ${eew.magunitude}`;
+		const body = `깊이 ${eew.depth}, 최대 진도 ${eew.calcintensity}`;
+
+		// 1. Nuxt UI Toast (앱 내부 알림)
+		toast.add({
+			title: "지진 속보 수신",
+			description: title,
+			icon: "i-heroicons-exclamation-triangle",
+			color: "neutral",
+		});
+
+		// 2. 브라우저 알림 (앱이 백그라운드일 때 유용)
+		if (
+			typeof Notification !== "undefined" &&
+			Notification.permission === "granted"
+		) {
+			// 모바일에서는 서비스 워커가 필요할 수 있으나, 데스크탑/안드로이드 일부 환경에서는 바로 작동
+			new Notification("지진 조기 경보 (EEW)", {
+				body: `${title}\n${body}`,
+				icon: "/icon-192x192.png", // public 폴더의 아이콘 경로
+				tag: eew.report_id || eew.origin_time, // 태그가 같으면 알림이 쌓이지 않고 갱신됨
+				requireInteraction: true, // 사용자가 닫을 때까지 유지
+			});
+		}
+	};
+
+	const requestNotificationPermission = async () => {
+		if (typeof Notification !== "undefined") {
+			const permission = await Notification.requestPermission();
+			notificationPermission.value = permission; // [NEW] 상태 업데이트
+
+			if (permission === "granted") {
+				toast.add({ title: "알림이 활성화되었습니다." });
+			}
+		}
+	};
 
 	// [헬퍼] request_time 문자열(YYYYMMDDHHmmss)을 Date 객체로 변환
 	const parseRequestTime = (timeStr: string): Date | null => {
@@ -88,13 +143,33 @@ export const useEEWMonitor = () => {
 
 				// 1. EEW 데이터 처리
 				if (response.eew) {
-					eewData.value = response.eew;
+					const incomingEEW = response.eew;
+
+					// [NEW] 새로운 지진인지 판별 (Event ID 또는 발생 시간 활용)
+					// API 응답에 event_id나 report_id가 있다면 그것을 사용.
+					// 없다면 origin_time을 식별자로 사용.
+					const currentId =
+						incomingEEW.report_id || incomingEEW.origin_time;
+
+					// 데이터가 유효하고(취소가 아니고), 이전에 받은 ID와 다를 때
+					if (
+						currentId &&
+						lastEventId.value !== currentId &&
+						incomingEEW.is_cancel !== true
+					) {
+						lastEventId.value = currentId; // ID 갱신
+						sendNotification(incomingEEW); // 알림 발송
+
+						// (옵션) 효과음 재생을 원하면 여기서 playSound() 호출
+					}
+
+					eewData.value = incomingEEW;
 					connectionStatus.value = "live";
 					lastErrorMessage.value = null;
 				} else {
-					// eew가 없어도 연결 상태는 정상이므로 live 유지
 					connectionStatus.value = "live";
-					// eewData.value = null; // 필요하다면 초기화 (보통은 이전 데이터를 유지하거나 null 처리)
+					// eew 데이터가 사라지면(상황 종료), ID를 초기화할지 결정
+					// lastEventId.value = null; // 필요시 주석 해제
 				}
 
 				// 2. 관측소 데이터 처리
@@ -147,6 +222,11 @@ export const useEEWMonitor = () => {
 		isFetching = false;
 	};
 
+	// 마운트 시 현재 권한 상태 확인
+    onMounted(() => {
+        checkNotificationPermission();
+    });
+
 	return {
 		eewData,
 		stationPointsData,
@@ -156,5 +236,7 @@ export const useEEWMonitor = () => {
 		handleManualSync,
 		initEEW,
 		stopEEW,
+		requestNotificationPermission,
+		notificationPermission,
 	};
 };

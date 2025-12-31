@@ -4,10 +4,12 @@
 	>
 		<div class="pointer-events-auto w-full">
 			<div
-				class="flex w-full items-center justify-between gap-3 rounded-full border border-white/10 bg-black/70 px-4 py-2 text-white shadow-lg backdrop-blur-md transition-all hover:bg-black/80"
+				class="flex w-full items-center justify-between gap-2 rounded-full border border-white/10 bg-black/70 px-3 py-2 text-white shadow-lg backdrop-blur-md transition-all hover:bg-black/80"
 			>
-				<div class="flex items-center gap-2 font-mono text-xs font-semibold">
-					<span class="relative flex h-2.5 w-2.5">
+				<div
+					class="flex flex-1 items-center gap-2 overflow-hidden font-mono text-xs font-semibold"
+				>
+					<span class="relative flex h-2.5 w-2.5 flex-shrink-0">
 						<span
 							v-if="status === 'live' || status === 'syncing'"
 							class="absolute inline-flex h-full w-full rounded-full opacity-75"
@@ -26,31 +28,62 @@
 							}"
 						></span>
 					</span>
-					<span class="tracking-wider text-gray-200">
+					<span class="truncate tracking-wider text-gray-200">
 						{{ currentTime || "Connecting..." }}
 					</span>
 				</div>
 
-				<button
-					@click="$emit('sync')"
-					:disabled="status === 'syncing'"
-					class="group flex items-center gap-1.5 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-gray-400 transition-colors hover:bg-white/10 hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
-				>
-					<svg
-						xmlns="http://www.w3.org/2000/svg"
-						viewBox="0 0 20 20"
-						fill="currentColor"
-						class="h-3 w-3 transition-transform duration-700 group-hover:rotate-180"
-						:class="{ 'animate-spin': status === 'syncing' }"
+				<div class="flex items-center gap-1">
+					<button
+						@click="$emit('request-permission')"
+						:title="notificationEnabled ? '알림 켜짐' : '알림 켜기'"
+						class="group flex h-6 w-6 items-center justify-center rounded-full transition-colors hover:bg-white/10"
+						:class="[
+							notificationEnabled
+								? 'text-yellow-400 bg-white/5'
+								: 'text-gray-400 hover:text-yellow-400',
+						]"
 					>
-						<path
-							fill-rule="evenodd"
-							d="M15.312 11.424a5.5 5.5 0 01-9.201 2.466l-.312-.311h2.433a.75.75 0 000-1.5H3.989a.75.75 0 00-.75.75v4.242a.75.75 0 001.5 0v-2.43l.31.31a7 7 0 0011.712-3.138.75.75 0 00-1.449-.39zm1.23-3.723a.75.75 0 00.219-.53V2.929a.75.75 0 00-1.5 0v2.433l-.31-.31a7 7 0 00-11.712 3.138.75.75 0 001.449.39 5.5 5.5 0 019.201-2.466l.312.311H12.133a.75.75 0 000 1.5h4.242a.75.75 0 00.53-.219z"
-							clip-rule="evenodd"
-						/>
-					</svg>
-					{{ status === "syncing" ? "Syncing" : "Sync" }}
-				</button>
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							viewBox="0 0 20 20"
+							fill="currentColor"
+							class="h-4 w-4"
+						>
+							<path
+								v-if="notificationEnabled"
+								d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z"
+							/>
+							<path
+								v-else
+								d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z"
+							/>
+						</svg>
+					</button>
+
+					<div class="h-3 w-px bg-white/20"></div>
+
+					<button
+						@click="$emit('sync')"
+						:disabled="status === 'syncing'"
+						class="group flex items-center gap-1.5 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-gray-400 transition-colors hover:bg-white/10 hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
+					>
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							viewBox="0 0 20 20"
+							fill="currentColor"
+							class="h-3 w-3 transition-transform duration-700 group-hover:rotate-180"
+							:class="{ 'animate-spin': status === 'syncing' }"
+						>
+							<path
+								fill-rule="evenodd"
+								d="M15.312 11.424a5.5 5.5 0 01-9.201 2.466l-.312-.311h2.433a.75.75 0 000-1.5H3.989a.75.75 0 00-.75.75v4.242a.75.75 0 001.5 0v-2.43l.31.31a7 7 0 0011.712-3.138.75.75 0 00-1.449-.39zm1.23-3.723a.75.75 0 00.219-.53V2.929a.75.75 0 00-1.5 0v2.433l-.31-.31a7 7 0 00-11.712 3.138.75.75 0 001.449.39 5.5 5.5 0 019.201-2.466l.312.311H12.133a.75.75 0 000 1.5h4.242a.75.75 0 00.53-.219z"
+								clip-rule="evenodd"
+							/>
+						</svg>
+						{{ status === "syncing" ? "Syncing" : "Sync" }}
+					</button>
+				</div>
 			</div>
 		</div>
 
@@ -78,8 +111,12 @@
 				v-else-if="!eewData"
 				class="flex items-center justify-center rounded-lg border border-gray-800 bg-gray-900/80 p-2.5 text-gray-400 backdrop-blur shadow-lg"
 			>
-				<div class="mr-2 h-1.5 w-1.5 animate-pulse rounded-full bg-gray-500"></div>
-				<span class="text-xs font-medium tracking-wide">대기 중...</span>
+				<div
+					class="mr-2 h-1.5 w-1.5 animate-pulse rounded-full bg-gray-500"
+				></div>
+				<span class="text-xs font-medium tracking-wide"
+					>대기 중...</span
+				>
 			</div>
 
 			<div
@@ -102,7 +139,6 @@
 					class="absolute inset-y-0 left-0 w-1"
 					:class="isCancel ? 'bg-gray-500' : 'bg-red-600'"
 				></div>
-
 				<div class="flex items-center gap-3 p-3 pl-4">
 					<div
 						class="flex h-12 w-12 flex-shrink-0 flex-col items-center justify-center rounded-lg shadow-sm"
@@ -112,43 +148,62 @@
 								: 'bg-gradient-to-br from-yellow-400 to-orange-500 text-white',
 						]"
 					>
-						<span class="text-[0.55rem] font-bold opacity-90 leading-none mb-0.5">진도</span>
+						<span
+							class="text-[0.55rem] font-bold opacity-90 leading-none mb-0.5"
+							>진도</span
+						>
 						<span
 							class="font-mono text-2xl font-black leading-none tracking-tighter shadow-black drop-shadow-sm"
+							>{{ displayIntensity }}</span
 						>
-							{{ displayIntensity }}
-						</span>
 					</div>
-
 					<div class="flex min-w-0 flex-1 flex-col justify-center">
 						<div class="flex items-center gap-2 mb-1">
 							<span
 								class="flex-shrink-0 rounded px-1.5 py-0.5 text-[10px] font-bold text-white shadow-sm"
 								:class="isCancel ? 'bg-gray-500' : 'bg-red-600'"
+								>{{ isCancel ? "취소" : "속보"
+								}}<span class="opacity-75"
+									>|
+									{{
+										isFinal
+											? "최종"
+											: `#${eewData.report_num}`
+									}}</span
+								></span
 							>
-								{{ isCancel ? "취소" : "속보" }}
-								<span class="opacity-75">| {{ isFinal ? "최종" : `#${eewData.report_num}` }}</span>
-							</span>
 							<span
 								class="truncate text-lg font-bold leading-tight text-white drop-shadow-md"
+								>{{ eewData.region_name }}</span
 							>
-								{{ eewData.region_name }}
-							</span>
 						</div>
-
-						<div class="flex items-center gap-3 text-xs font-medium text-gray-300">
-							<span class="font-mono text-gray-400">
-                                {{ formatOriginTime(eewData.origin_time).split(" ")[1] }}
-                            </span>
+						<div
+							class="flex items-center gap-3 text-xs font-medium text-gray-300"
+						>
+							<span class="font-mono text-gray-400">{{
+								formatOriginTime(eewData.origin_time).split(
+									" "
+								)[1]
+							}}</span>
 							<div class="h-3 w-px bg-gray-700"></div>
 							<div class="flex items-baseline gap-1">
-								<span :class="isCancel ? 'text-gray-500' : 'text-yellow-500'">M</span>
-								<span class="font-mono font-bold text-white">{{ eewData.magunitude }}</span>
+								<span
+									:class="
+										isCancel
+											? 'text-gray-500'
+											: 'text-yellow-500'
+									"
+									>M</span
+								><span class="font-mono font-bold text-white">{{
+									eewData.magunitude
+								}}</span>
 							</div>
 							<div class="h-3 w-px bg-gray-700"></div>
 							<div class="flex items-baseline gap-1">
-								<span class="text-gray-500">깊이</span>
-								<span class="font-mono font-bold text-white">{{ eewData.depth }}</span>
+								<span class="text-gray-500">깊이</span
+								><span class="font-mono font-bold text-white">{{
+									eewData.depth
+								}}</span>
 							</div>
 						</div>
 					</div>
@@ -165,10 +220,12 @@ const props = defineProps<{
 	eewData: any;
 	currentTime: string;
 	status: string;
+	notificationEnabled?: boolean; // [NEW] prop 추가 (옵셔널)
 }>();
 
 defineEmits<{
 	(e: "sync"): void;
+	(e: "request-permission"): void; // [NEW] 이벤트 정의 추가
 }>();
 
 const isEmptyResponse = computed(() => {

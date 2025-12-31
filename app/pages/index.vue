@@ -7,6 +7,8 @@
 					:current-time="currentDisplayTime"
 					:status="connectionStatus"
 					@sync="handleManualSync"
+					:notification-enabled="isNotificationEnabled"
+					@request-permission="requestNotificationPermission"
 				/>
 			</Teleport>
 		</template>
@@ -39,6 +41,8 @@ const {
 	handleManualSync,
 	initEEW,
 	stopEEW,
+	requestNotificationPermission,
+	notificationPermission,
 } = useEEWMonitor();
 
 // 다크모드 여부 계산
@@ -62,7 +66,7 @@ onBeforeUnmount(() => {
 // [NEW] 컬러 모드 변경 감지 -> 맵 스타일 업데이트
 watch(isDark, (newVal) => {
 	changeMapStyle(newVal);
-	
+
 	// 스타일 변경 후 'styledata' 이벤트가 발생하여 레이어가 다시 생성되지만,
 	// 데이터는 비어있는 상태일 수 있습니다.
 	// 현재 가지고 있는 데이터를 강제로 다시 주입하여 화면 깜빡임을 최소화합니다.
@@ -104,6 +108,11 @@ watch(
 			updateEEWVisuals(newEEW, newTime);
 		}
 	}
+);
+
+// 권한이 'granted'이면 true
+const isNotificationEnabled = computed(
+	() => notificationPermission.value === "granted"
 );
 </script>
 
