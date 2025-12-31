@@ -81,9 +81,17 @@ class MouseCoordinatesControl implements maplibregl.IControl {
 export const useEEWMap = () => {
 	const isMapLoaded = ref(false);
 
+	// [NEW] 위치 관련 상태
+    const isLocationActive = ref(false);
+    // [NEW] 위치 에러 상태 (timestamp를 포함해 같은 에러가 반복돼도 감지 가능하게 함)
+    const locationError = ref<{ code: number; message: string; timestamp: number } | null>(null);
+
 	let map: maplibregl.Map | null = null;
 	let userMarker: maplibregl.Marker | null = null;
 	let district: GeoJSON.FeatureCollection | null = null;
+	
+	// [NEW] GeolocateControl 인스턴스 저장용
+    let geolocateControl: maplibregl.GeolocateControl | null = null;
 
 	// [1] 가운데 클릭 패닝을 위한 상태 변수
     let isMiddlePanning = false;
@@ -139,6 +147,14 @@ export const useEEWMap = () => {
         if (e.button === 1 && isMiddlePanning) {
             isMiddlePanning = false;
             if (map) map.getCanvas().style.cursor = '';
+        }
+    };
+
+	// [NEW] 외부에서 위치 찾기를 트리거하는 함수
+    const triggerLocation = () => {
+        if (geolocateControl) {
+            // trigger()는 위치 찾기를 시작합니다.
+            geolocateControl.trigger();
         }
     };
 
@@ -437,7 +453,7 @@ export const useEEWMap = () => {
 			container,
 			style: initialDarkMode ? STYLE_DARK : STYLE_LIGHT, // 초기 스타일 설정
 			center: [139.6917, 35.6894],
-			zoom: 4.75,
+			zoom: 4.7,
 			maxBounds: MAX_BOUNDS,
 			attributionControl: false,
 			dragPan: true,
@@ -471,43 +487,80 @@ export const useEEWMap = () => {
 		map.touchPitch.disable();
 		map.boxZoom.disable();
 
-		const geolocate = new maplibregl.GeolocateControl({
-			trackUserLocation: false,
-			showUserLocation: false,
-			fitBoundsOptions: { maxZoom: 4.75 },
-		});
-		map.addControl(geolocate, "top-right");
-
 		// [변경] 마우스 좌표 컨트롤을 'bottom-left'에 추가
 		// 가장 먼저 추가하면 가장 아래쪽에 깔리고, 나중에 추가하면 그 위에 쌓임
 		// EEWControl(모니터)보다 아래 혹은 위에 두고 싶은지에 따라 순서 조정 가능.
 		// 여기서는 좌표를 가장 하단 구석에 두기 위해 먼저 추가
 		map.addControl(new MouseCoordinatesControl(), "bottom-right");
 
-		// [2] geolocate 이벤트 수정
-        geolocate.on("geolocate", (e) => {
+		// [수정] GeolocateControl 설정 변경
+        geolocateControl = new maplibregl.GeolocateControl({
+            positionOptions: {
+                enableHighAccuracy: true
+            },
+            // [중요] trackUserLocation을 true로 해야 '추적 중' 상태(아이콘 색상 유지)가 가능합니다.
+            trackUserLocation: true, 
+            showUserLocation: false, // 마커는 직접 커스텀하게 그리므로 false 유지
+            showAccuracyCircle: false,
+            fitBoundsOptions: { maxZoom: 4.7 }, // 줌 레벨 조정 (필요시 수정)
+        });
+
+		// 컨트롤을 맵에 추가하되, CSS로 숨기기 위해 커스텀 클래스나 스타일 조작 필요
+        // MapLibre는 컨트롤을 추가해야만 기능이 동작합니다.
+        map.addControl(geolocateControl, "bottom-right");
+        
+        // [TRICK] 방금 추가한 GeolocateControl의 버튼(DOM)을 숨깁니다.
+        // _container는 내부 private 속성이지만 접근 가능하거나, map container에서 찾을 수 있습니다.
+        // 여기서는 안전하게 DOM 탐색을 최소화하기 위해 CSS 클래스 추가 방식 대신 직접 스타일 제어
+        const geolocateBtn = (geolocateControl as any)._container as HTMLElement;
+        if (geolocateBtn) {
+            geolocateBtn.style.display = "none";
+        }
+		
+		/// [NEW] 위치 확인 성공 이벤트
+		geolocateControl.on("geolocate", (e: any) => {
+            isLocationActive.value = true;
             const lng = e.coords.longitude;
             const lat = e.coords.latitude;
-
-            // 좌표 저장
             lastUserCoords = { lng, lat };
 
             if (!userMarker) {
-                userMarker = new maplibregl.Marker({ color: "#ff0000" })
-                    .setLngLat([lng, lat])
-                    .addTo(map!);
+                userMarker = new maplibregl.Marker({ color: "#ff0000" }).setLngLat([lng, lat]).addTo(map!);
             } else {
                 userMarker.setLngLat([lng, lat]);
             }
-
             highlightUserRegion(lng, lat);
+        });
+
+        // [NEW] 추적 중단 이벤트 (지도 드래그 등)
+        // [FIX] 위치를 찾자마자 줌인/패닝 동작으로 인해 '추적 중단'으로 인식되어 
+        // 아이콘 불이 바로 꺼지는 현상을 방지하기 위해 로직을 주석 처리합니다.
+        geolocateControl.on("trackuserlocationend", () => {
+            // isLocationActive.value = false;
+        });
+
+        // [NEW] 위치 에러 이벤트 (핵심)
+        // [FIX] 에러 객체 파싱을 강화하여 토스트 알림이 잘 뜨도록 수정
+        geolocateControl.on("error", (e: any) => {
+            console.error("Geolocate Error:", e); // 디버깅용 로그
+            isLocationActive.value = false;
+            
+            // MapLibre 버전에 따라 에러 객체 위치가 다를 수 있음 (e.error 또는 e)
+            const errorObj = e.error || e; 
+
+            locationError.value = {
+                code: errorObj.code || 0, // 1: Permission denied, 2: Unavailable, 3: Timeout
+                message: errorObj.message || "Unknown error",
+                timestamp: Date.now() // Watcher가 항상 반응하도록 타임스탬프 갱신
+            };
         });
 
 		map.on("load", async () => {
 			// [REFACTOR] 로드 시 setupLayers 호출
 			setupLayers();
 			isMapLoaded.value = true;
-			geolocate.trigger();
+			// 로드 시 자동 실행을 원하면 주석 해제
+            geolocateControl?.trigger();
 		});
 	};
 
@@ -538,5 +591,8 @@ export const useEEWMap = () => {
 		updateStationPoints,
 		updateEEWVisuals, // [NEW] export 추가
 		changeMapStyle, // [NEW] export
+		triggerLocation, // [NEW] export
+        isLocationActive, // [NEW] export
+		locationError, // 에러 상태 내보내기
 	};
 };

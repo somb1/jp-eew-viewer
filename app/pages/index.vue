@@ -7,6 +7,8 @@
 					:current-time="currentDisplayTime"
 					:status="connectionStatus"
 					:notification-enabled="finalNotificationState"
+                    :location-active="isLocationActive"
+                    @trigger-location="handleLocationTrigger"
 					v-model:current-type="monitorType"
 					v-model:current-source="monitorSource"
 					@sync="handleManualSync"
@@ -33,6 +35,10 @@ const {
 	isMapLoaded,
 	updateEEWVisuals, // [NEW] 가져오기
 	changeMapStyle, // [NEW] 가져오기
+	// [NEW] 가져오기
+    triggerLocation,
+    isLocationActive,
+	locationError, // [NEW] 에러 상태 가져오기
 } = useEEWMap();
 
 const {
@@ -53,6 +59,41 @@ const {
 // 다크모드 여부 계산
 const isDark = computed(() => {
 	return colorMode.value === "dark";
+});
+
+const toast = useToast(); // Toast 사용을 위해 가져오기 (없으면 const toast = useToast() 추가)
+
+// [NEW] 위치 버튼 핸들러: 토스트 없이 기능만 실행
+const handleLocationTrigger = () => {
+    triggerLocation();
+};
+
+// [FIXED] 에러 감지 로직
+watch(locationError, (err) => {
+    if (!err) return;
+    
+    console.log("Location Error Caught in Watcher:", err); // 디버깅용
+
+    if (err.code === 1) { // PERMISSION_DENIED
+         toast.add({ 
+             title: "위치 권한이 거부되었습니다.", 
+             description: "브라우저 설정에서 위치 권한을 허용해주세요.", 
+             icon: "i-heroicons-exclamation-triangle", 
+         });
+    } else if (err.code === 2 || err.code === 3) { // POSITION_UNAVAILABLE or TIMEOUT
+         toast.add({ 
+             title: "위치 확인 실패", 
+             description: "현재 위치를 가져올 수 없습니다. (Code: " + err.code + ")", 
+             icon: "i-heroicons-exclamation-circle", 
+         });
+    } else {
+        // 기타 에러
+        toast.add({ 
+             title: "위치 오류", 
+             description: err.message, 
+             icon: "i-heroicons-exclamation-circle", 
+         });
+    }
 });
 
 // 라이프사이클 관리

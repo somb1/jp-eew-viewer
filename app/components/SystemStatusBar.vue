@@ -53,6 +53,22 @@
                     </button>
 
                     <button
+                        @click="$emit('trigger-location')"
+                        class="group flex h-6 w-6 items-center justify-center rounded-full transition-all duration-300 hover:bg-white/10"
+                        :class="[
+                            locationActive
+                                ? 'bg-white/5 text-green-400 shadow-[0_0_10px_rgba(74,222,128,0.2)]' 
+                                : 'text-gray-400 hover:text-green-400',
+                        ]"
+                        title="내 위치 찾기"
+                    >
+                        <UIcon 
+                            name="i-heroicons-map-pin-20-solid" 
+                            class="h-4 w-4 transition-transform group-hover:scale-110"
+                        />
+                    </button>
+
+                    <button
                         @click="$emit('toggle-notification')"
                         class="group flex h-6 w-6 items-center justify-center rounded-full transition-all duration-300 hover:bg-white/10"
                         :class="[
@@ -203,6 +219,8 @@ const props = defineProps<{
     currentTime: string;
     status: string;
     notificationEnabled?: boolean;
+    // [NEW] 위치 활성화 상태 (true면 버튼이 초록색으로 켜짐)
+    locationActive?: boolean; 
     currentType: string;
     currentSource: string;
 }>();
@@ -210,10 +228,13 @@ const props = defineProps<{
 const emit = defineEmits<{
     (e: "sync"): void;
     (e: "toggle-notification"): void;
+    // [NEW] 위치 버튼 클릭 시 상위 컴포넌트로 알림
+    (e: "trigger-location"): void;
     (e: "update:currentType", value: string): void;
     (e: "update:currentSource", value: string): void;
 }>();
 
+// 설정값 양방향 바인딩을 위한 computed
 const proxyType = computed({
     get: () => props.currentType || 'acmap',
     set: (val) => emit('update:currentType', val)
@@ -224,20 +245,23 @@ const proxySource = computed({
     set: (val) => emit('update:currentSource', val)
 });
 
+// 설정 패널 토글 상태
 const showSettings = ref(false);
 const toggleSettings = () => {
     showSettings.value = !showSettings.value;
 };
 
-// [NEW] 날짜와 시간 분리
+// 날짜와 시간 텍스트 분리 (UI 디자인용)
 const splitTime = computed(() => {
     if (!props.currentTime) return { date: '', time: 'Connecting...' };
     const parts = props.currentTime.split(' ');
+    // 마지막 부분이 시간, 그 앞부분이 날짜
     const date = parts.slice(0, -1).join(' ');
     const time = parts[parts.length - 1];
     return { date, time };
 });
 
+// 라벨 매핑 상수
 const DISPLAY_TYPE_LABELS: Record<string, string> = {
     jma: "진도",
     acmap: "PGA",
@@ -269,31 +293,37 @@ const SOURCE_LABELS: Record<string, string> = {
     b: "지중 (Borehole)",
 };
 
+// 현재 설정 상태 텍스트
 const currentSettingsDisplay = computed(() => {
     const type = DISPLAY_TYPE_LABELS[props.currentType] || props.currentType;
     const source = props.currentSource === 's' ? '지표' : '지중';
     return `${type} · ${source}`;
 });
 
-// ... (기존 computed 로직)
+// EEW 데이터 관련 상태 계산
 const isEmptyResponse = computed(() => {
     if (!props.eewData) return false;
     const msg = props.eewData.result?.message || "";
     return msg.includes("データがありません");
 });
+
 const isCancel = computed(() => {
     const val = props.eewData?.is_cancel;
     return val === "true" || val === true;
 });
+
 const isFinal = computed(() => {
     const val = props.eewData?.is_final;
     return val === "true" || val === true;
 });
+
 const displayIntensity = computed(() => {
     const val = props.eewData?.calcintensity;
     if (!val || val === "0") return "-";
     return val;
 });
+
+// YYYYMMDDHHmmss 형식을 포맷팅
 const formatOriginTime = (rawTime: string) => {
     if (!rawTime || rawTime.length < 14) return rawTime;
     const Y = rawTime.substring(0, 4);
