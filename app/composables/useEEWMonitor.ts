@@ -87,25 +87,42 @@ export const useEEWMonitor = () => {
 		return new Date(year, month, day, hour, min, sec);
 	};
 
-	// [로직 1] 서버 시간 동기화
-	const syncFromServer = async (): Promise<boolean> => {
-		try {
-			const latestRes = await fetch("/api/latest").then((r) => r.json());
-			const newTime = new Date(latestRes.latest_time);
+	// [수정 1] 타임아웃이 적용된 서버 동기화 함수
+    // 5초 안에 응답이 없으면 강제로 에러 처리하여 'Syncing' 상태를 품
+    const syncFromServer = async (): Promise<boolean> => {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000); // 5초 타임아웃 설정
 
-			simulatedTime = newTime;
-			currentDisplayTime.value = formatDateToDisplay(newTime);
-			lastErrorMessage.value = null;
+        try {
+            const latestRes = await fetch("/api/latest", {
+                signal: controller.signal, // 타임아웃 신호 연결
+            }).then((r) => r.json());
 
-			console.log("Synced time to:", newTime);
-			return true;
-		} catch (error: any) {
-			console.error("Failed to sync latest time:", error);
-			connectionStatus.value = "error";
-			lastErrorMessage.value = "Sync Failed";
-			return false;
-		}
-	};
+            clearTimeout(timeoutId); // 성공 시 타임아웃 해제
+
+            const newTime = new Date(latestRes.latest_time);
+            simulatedTime = newTime;
+            currentDisplayTime.value = formatDateToDisplay(newTime);
+            lastErrorMessage.value = null;
+
+            console.log("Synced time to:", newTime);
+            return true;
+        } catch (error: any) {
+            clearTimeout(timeoutId); // 에러 발생 시에도 타임아웃 해제
+            
+            console.error("Failed to sync latest time:", error);
+            
+            // AbortError(타임아웃)인 경우 메시지 명시
+            if (error.name === 'AbortError') {
+                lastErrorMessage.value = "Network Timeout";
+            } else {
+                lastErrorMessage.value = "Sync Failed";
+            }
+            
+            connectionStatus.value = "error"; // 상태를 확실하게 error로 변경
+            return false;
+        }
+    };
 
 	// [로직 2] 루프 실행
 	const startLoop = () => {
@@ -238,18 +255,28 @@ export const useEEWMonitor = () => {
         isFetching = false;
     };
 
+    // [수정 2] 수동 동기화 핸들러 안전장치 강화
     const handleManualSync = async () => {
-        // 이미 싱크 중이면 중복 실행 방지
+        // 이미 싱크 중이라면 무시하되, 
+        // 혹시 모를 교착 상태 방지를 위해 10초 이상 Syncing이면 강제 재시도 로직을 넣을 수도 있음.
+        // 여기서는 간단히 상태 체크만 합니다.
         if (connectionStatus.value === "syncing") return;
-        
-        stopEEW(); // 기존 워커 확실히 종료
+
+        stopEEW(); // 기존 타이머 정지
         isFetching = false;
         connectionStatus.value = "syncing";
-        
-        console.log("Starting manual sync...");
+
+        // [팁] 모바일 등에서 네트워크가 늦게 붙는 것을 대비해 아주 짧은 지연을 줄 수 있음 (선택 사항)
+        // await new Promise(r => setTimeout(r, 100));
+
         const success = await syncFromServer();
+        
         if (success) {
             startLoop();
+        } else {
+            // 실패했다면 상태는 이미 'error'로 설정되어 있음 (syncFromServer 내부에서)
+            // 루프는 시작하지 않으므로 사용자가 수동으로 'Sync' 버튼을 눌러야 함
+            console.warn("Sync failed, loop not started.");
         }
     };
 
