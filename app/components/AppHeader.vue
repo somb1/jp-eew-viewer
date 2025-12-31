@@ -17,5 +17,3 @@
 		<template #body> </template>
 	</UHeader>
 </template>
-
-<script setup lang="ts"></script>
