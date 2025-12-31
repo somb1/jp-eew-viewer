@@ -92,8 +92,8 @@ export const useEEWMonitor = () => {
         // 2. 권한이 이미 거부된 경우 (denied)
         if (currentPerm === 'denied') {
             toast.add({
-                title: "알림 권한이 차단되어 있습니다.",
-                description: "아이폰 설정 > 알림 > 이 앱(웹) 선택 > '알림 허용'을 켜주세요.",
+                title: "알림 권한이 차단되었습니다.",
+                description: "브라우저 또는 기기 설정에서 알림 권한을 허용해주세요.",
                 icon: "i-heroicons-exclamation-circle",
             });
             isNotificationActive.value = false;
