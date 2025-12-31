@@ -298,7 +298,7 @@ export const useEEWMonitor = () => {
                         
                         // 차이가 5초(5000ms) 이내이고, 미래 시간이 아닐 때 (혹은 약간의 오차 허용)
                         // 0보다 작으면(미래) 데이터 오류일 수 있으나, 일단 5초 이내 차이만 확인
-                        if (diffMs >= 0 && diffMs <= 5000) {
+                        if (diffMs >= 0 && diffMs <= 60000) {
                             isRecentEvent = true;
                         }
                     }
