@@ -39,6 +39,7 @@ const {
     triggerLocation,
     isLocationActive,
 	locationError, // [NEW] 에러 상태 가져오기
+	refreshMapLayout,
 } = useEEWMap();
 
 const {
@@ -133,15 +134,26 @@ watch(isDark, (newVal) => {
 // 화면 가시성 변경 시 재동기화
 const visibility = useDocumentVisibility();
 watch(visibility, (current) => {
-	// 화면이 켜졌을 때, 시간 차이가 크면 useEEWMonitor 내부 로직에 의해
-	// 다음 틱(tick) 혹은 pageshow 이벤트에서 처리되겠지만,
-	// 즉각적인 반응을 위해 여기서도 호출 가능
-	if (current === "visible") {
-		// handleManualSync 내부에서 어차피 상태(syncing)를 체크하므로 안전함
-		// 강제로 호출해도 되지만, 위 useEEWMonitor의 drift 체크 로직에 맡기는 것이 더 깔끔함.
-		// 굳이 명시적으로 부르고 싶다면:
-		// handleManualSync();
-	}
+    if (current === "visible") {
+        // Safari PWA 복귀 시 렌더링 멈춤 현상 해결을 위한 로직
+        // 약간의 지연(300ms)을 주어 브라우저가 그래픽 리소스를 복구할 시간을 줌
+        setTimeout(() => {
+            if (isMapLoaded.value) {
+                // 1. 맵 캔버스 크기 재계산 (멈춘 렌더링 루프 깨우기)
+                refreshMapLayout();
+
+                // 2. 가지고 있는 데이터 강제 재주입 (화면 갱신)
+                if (stationPointsData.value) {
+                    updateStationPoints(stationPointsData.value);
+                }
+                
+                // 3. EEW 파동 데이터도 있다면 재주입
+                if (eewData.value) {
+                    updateEEWVisuals(eewData.value, currentDisplayTime.value);
+                }
+            }
+        }, 300); 
+    }
 });
 
 // 관측소 데이터 업데이트

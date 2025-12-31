@@ -118,6 +118,13 @@ export const useEEWMap = () => {
 	const V_P = 6.0;
 	const V_S = 3.5;
 
+	// [NEW] 맵 레이아웃 강제 재계산 및 렌더링 깨우기
+    const refreshMapLayout = () => {
+        if (map) {
+            map.resize();
+        }
+    };
+
 	// [2] 이벤트 핸들러 정의
     
     // 마우스 누름: 가운데 버튼(button === 1)인지 확인
@@ -630,5 +637,6 @@ export const useEEWMap = () => {
 		triggerLocation, // [NEW] export
         isLocationActive, // [NEW] export
 		locationError, // 에러 상태 내보내기
+		refreshMapLayout,
 	};
 };
