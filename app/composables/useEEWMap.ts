@@ -98,6 +98,11 @@ export const useEEWMap = () => {
     let startX = 0;
     let startY = 0;
 
+	// [NEW] 관성 효과를 위한 변수 추가
+    let lastDeltaX = 0;
+    let lastDeltaY = 0;
+    let lastMoveTime = 0;
+
 	// [1] 마지막 사용자 위치를 저장할 변수 추가
     let lastUserCoords: { lng: number; lat: number } | null = null;
 
@@ -126,27 +131,58 @@ export const useEEWMap = () => {
         }
     };
 
-    // 마우스 이동: 패닝 처리
+    // 마우스 이동: 패닝 처리 + 관성 데이터 수집
 	const onMouseMove = (e: MouseEvent) => {
 		if (!isMiddlePanning || !map) return;
 		e.preventDefault();
 
+        // 현재 프레임의 이동량 계산
 		const dx = e.clientX - startX;
 		const dy = e.clientY - startY;
 
-		// [수정] dx, dy에 마이너스(-)를 붙여 반대 방향으로 이동시킵니다.
-		// 원리: 마우스를 오른쪽(동쪽)으로 끌면 -> 카메라는 왼쪽(서쪽)으로 가야 -> 지도가 오른쪽으로 이동해 보임
+        // 즉시 이동 (animate: false로 해야 드래그가 빠릿함)
 		map.panBy([-dx, -dy], { animate: false });
 
+        // [NEW] 관성 계산을 위해 데이터 저장
+        lastDeltaX = dx;
+        lastDeltaY = dy;
+        lastMoveTime = performance.now();
+
+        // 다음 계산을 위해 기준점 갱신
 		startX = e.clientX;
 		startY = e.clientY;
 	};
 
-    // 마우스 뗌: 드래그 종료
+    // 마우스 뗌: 드래그 종료 + 관성 적용
     const onMouseUp = (e: MouseEvent) => {
         if (e.button === 1 && isMiddlePanning) {
             isMiddlePanning = false;
             if (map) map.getCanvas().style.cursor = '';
+
+            // [NEW] 관성 적용 로직
+            const now = performance.now();
+            const timeSinceLastMove = now - lastMoveTime;
+
+            // 1. 마지막 움직임 이후 50ms 이내에 뗐을 때만 관성 적용 (멈추고 떼면 관성 없음)
+            // 2. 이동량이 너무 작으면(1px 미만) 무시
+            if (timeSinceLastMove < 50 && (Math.abs(lastDeltaX) > 1 || Math.abs(lastDeltaY) > 1)) {
+                
+                // 관성 계수 (클수록 더 멀리 미끄러짐)
+                const INERTIA_FACTOR = 5; 
+                // 감속 시간 (ms)
+                const DURATION = 600; 
+
+                // cubic-bezier(0,0,0.58,1) 느낌의 감속 함수 (EaseOutCubic)
+                const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3);
+
+                map?.panBy(
+                    [-lastDeltaX * INERTIA_FACTOR, -lastDeltaY * INERTIA_FACTOR], 
+                    { 
+                        duration: DURATION, 
+                        easing: easeOutCubic 
+                    }
+                );
+            }
         }
     };
 
