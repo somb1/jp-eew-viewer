@@ -6,9 +6,11 @@
 					:eew-data="eewData"
 					:current-time="currentDisplayTime"
 					:status="connectionStatus"
-					@sync="handleManualSync"
 					:notification-enabled="finalNotificationState"
-                    @toggle-notification="toggleNotification"
+					v-model:current-type="monitorType"
+					v-model:current-source="monitorSource"
+					@sync="handleManualSync"
+					@toggle-notification="toggleNotification"
 				/>
 			</Teleport>
 		</template>
@@ -42,8 +44,10 @@ const {
 	initEEW,
 	stopEEW,
 	toggleNotification, // [NEW] 가져오기
-    isNotificationActive, // [NEW] 가져오기
+	isNotificationActive, // [NEW] 가져오기
 	notificationPermission,
+	monitorType, // [NEW]
+	monitorSource, // [NEW]
 } = useEEWMonitor();
 
 // 다크모드 여부 계산
@@ -88,16 +92,15 @@ watch(isDark, (newVal) => {
 // 화면 가시성 변경 시 재동기화
 const visibility = useDocumentVisibility();
 watch(visibility, (current) => {
-    // 화면이 켜졌을 때, 시간 차이가 크면 useEEWMonitor 내부 로직에 의해
-    // 다음 틱(tick) 혹은 pageshow 이벤트에서 처리되겠지만,
-    // 즉각적인 반응을 위해 여기서도 호출 가능
-    if (current === "visible") {
-        // handleManualSync 내부에서 어차피 상태(syncing)를 체크하므로 안전함
-        // 강제로 호출해도 되지만, 위 useEEWMonitor의 drift 체크 로직에 맡기는 것이 더 깔끔함.
-        
-        // 굳이 명시적으로 부르고 싶다면:
-        // handleManualSync(); 
-    }
+	// 화면이 켜졌을 때, 시간 차이가 크면 useEEWMonitor 내부 로직에 의해
+	// 다음 틱(tick) 혹은 pageshow 이벤트에서 처리되겠지만,
+	// 즉각적인 반응을 위해 여기서도 호출 가능
+	if (current === "visible") {
+		// handleManualSync 내부에서 어차피 상태(syncing)를 체크하므로 안전함
+		// 강제로 호출해도 되지만, 위 useEEWMonitor의 drift 체크 로직에 맡기는 것이 더 깔끔함.
+		// 굳이 명시적으로 부르고 싶다면:
+		// handleManualSync();
+	}
 });
 
 // 관측소 데이터 업데이트
@@ -121,7 +124,9 @@ watch(
 // [MODIFIED] 최종 알림 상태 계산
 // 브라우저 권한도 있고(granted) + 앱 내부 스위치도 켜져있어야(true) -> true
 const finalNotificationState = computed(() => {
-    return notificationPermission.value === "granted" && isNotificationActive.value;
+	return (
+		notificationPermission.value === "granted" && isNotificationActive.value
+	);
 });
 </script>
 

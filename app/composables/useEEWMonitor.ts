@@ -29,6 +29,10 @@ export const useEEWMonitor = () => {
 	let simulatedTime: Date | null = null;
 	let isFetching = false;
 
+	// [NEW] 모니터링 설정 상태 (기본값 설정)
+    const monitorType = ref<string>("acmap"); // 기본값: 최대 가속도
+    const monitorSource = ref<string>("s");   // 기본값: 지표
+
 	// [NEW] 앱 내부 알림 스위치 (로컬 스토리지에 저장하여 설정 유지)
     // 브라우저 권한이 있어도 이 값이 false면 알림을 안 보냄
     const isNotificationActive = useStorage<boolean>("eew-notification-active", false);
@@ -226,12 +230,14 @@ export const useEEWMonitor = () => {
 			const timeParam = formatDateToParam(simulatedTime);
 
 			try {
-				const response = await fetch(
-					`/api/eew?time=${timeParam}&type=acmap&source=s`
-				).then((r) => {
-					if (!r.ok) throw new Error(`API Error: ${r.status}`);
-					return r.json();
-				});
+                // [MODIFIED] 동적 파라미터 적용 (monitorType.value, monitorSource.value 사용)
+                // 반응형 변수의 현재 값을 읽어와 URL 생성
+                const url = `/api/eew?time=${timeParam}&type=${monitorType.value}&source=${monitorSource.value}`;
+                
+                const response = await fetch(url).then((r) => {
+                    if (!r.ok) throw new Error(`API Error: ${r.status}`);
+                    return r.json();
+                });
 
 				// [변경] 응답받은 timestamp를 사용하여 화면 시간 업데이트
 				// eew 데이터 유무와 상관없이 서버가 해당 시간을 처리했으므로 시간을 갱신함
@@ -392,5 +398,7 @@ export const useEEWMonitor = () => {
         isNotificationActive, // [NEW] export
 		notificationPermission,
 		visibility,
+		monitorType,   // [NEW] export
+        monitorSource, // [NEW] export
 	};
 };

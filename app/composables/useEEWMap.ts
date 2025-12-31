@@ -21,57 +21,61 @@ class SystemStatusControl implements maplibregl.IControl {
 	}
 }
 
-// 3. [NEW] 마우스 좌표 표시용 컨트롤 (Nuxt UI 스타일 & 좌측 하단)
+// 3. [NEW] 마우스 좌표 표시용 컨트롤 (다크모드/라이트모드 대응 + 아이폰 Safe Area 대응)
 class MouseCoordinatesControl implements maplibregl.IControl {
-	private container: HTMLElement;
-	private map: maplibregl.Map | undefined;
+    private container: HTMLElement;
+    private map: maplibregl.Map | undefined;
 
-	constructor() {
-		this.container = document.createElement("div");
-		// [스타일 수정]
-		// maplibregl-ctrl: 필수 클래스
-		// pointer-events-none: 마우스 통과
-		// flex gap-x-3: 가로 배치
-		// text-[11px] font-mono: Nuxt UI 느낌의 깔끔한 고정폭 폰트
-		// font-semibold: 가독성 확보
-		// text-white drop-shadow-md: 배경 없이도 잘 보이게 처리 (진한 그림자)
-		this.container.className =
-			"maplibregl-ctrl pointer-events-none flex gap-x-3 text-[11px] font-mono font-semibold text-white drop-shadow-[0_1.5px_1.5px_rgba(0,0,0,0.9)]";
+    constructor() {
+        this.container = document.createElement("div");
 
-		this.container.style.display = "none";
+        // [스타일 수정 핵심]
+        // 1. text-gray-900: 라이트 모드일 때 진한 회색(검정 계열)
+        // 2. drop-shadow-[...rgba(255,255,255,1)]: 라이트 모드일 때 글씨 주변에 흰색 테두리(Halo)를 주어 지도 선 위에서도 잘 보이게 함
+        // 3. dark:text-white: 다크 모드일 때 흰색
+        // 4. dark:drop-shadow-[...]: 다크 모드일 때 검은 그림자
+        this.container.className =
+            "maplibregl-ctrl pointer-events-none flex gap-x-3 text-[11px] font-mono font-semibold " +
+            "text-gray-900 drop-shadow-[0_1px_2px_rgba(255,255,255,1)] " + 
+            "dark:text-white dark:drop-shadow-[0_1.5px_1.5px_rgba(0,0,0,0.9)]";
 
-		// 좌측 하단 구석에 딱 붙지 않게 약간의 여백 (Tailwind m-2 등 사용 가능하지만 컨트롤 특성상 style이 안전)
-		this.container.style.margin = "8px 8px 8px 8px";
-	}
+        this.container.style.display = "none";
 
-	onAdd(map: maplibregl.Map) {
-		this.map = map;
-		this.map.on("mousemove", this.onMouseMove);
-		this.map.on("mouseout", this.onMouseOut);
-		return this.container;
-	}
+        // [아이폰 PWA 하단 잘림 방지]
+        // 기본 마진 8px + Safe Area(홈 인디케이터 높이)
+        this.container.style.margin = "8px 8px 8px 8px"; 
+        this.container.style.marginBottom = "calc(8px + env(safe-area-inset-bottom))";
+    }
 
-	onRemove() {
-		this.container.remove();
-		this.map?.off("mousemove", this.onMouseMove);
-		this.map?.off("mouseout", this.onMouseOut);
-		this.map = undefined;
-	}
+    onAdd(map: maplibregl.Map) {
+        this.map = map;
+        this.map.on("mousemove", this.onMouseMove);
+        this.map.on("mouseout", this.onMouseOut);
+        return this.container;
+    }
 
-	private onMouseMove = (e: maplibregl.MapMouseEvent) => {
-		const lng = e.lngLat.lng.toFixed(4);
-		const lat = e.lngLat.lat.toFixed(4);
+    onRemove() {
+        this.container.remove();
+        this.map?.off("mousemove", this.onMouseMove);
+        this.map?.off("mouseout", this.onMouseOut);
+        this.map = undefined;
+    }
 
-		this.container.style.display = "flex";
-		this.container.innerHTML = `
-			<span>Lng: ${lng}</span>
-			<span>Lat: ${lat}</span>
-		`;
-	};
+    private onMouseMove = (e: maplibregl.MapMouseEvent) => {
+        // 소수점 4자리 고정으로 흔들림 방지
+        const lng = e.lngLat.lng.toFixed(4);
+        const lat = e.lngLat.lat.toFixed(4);
 
-	private onMouseOut = () => {
-		this.container.style.display = "none";
-	};
+        this.container.style.display = "flex";
+        this.container.innerHTML = `
+            <span>Lng: ${lng}</span>
+            <span>Lat: ${lat}</span>
+        `;
+    };
+
+    private onMouseOut = () => {
+        this.container.style.display = "none";
+    };
 }
 
 export const useEEWMap = () => {
@@ -478,7 +482,7 @@ export const useEEWMap = () => {
 		// 가장 먼저 추가하면 가장 아래쪽에 깔리고, 나중에 추가하면 그 위에 쌓임
 		// EEWControl(모니터)보다 아래 혹은 위에 두고 싶은지에 따라 순서 조정 가능.
 		// 여기서는 좌표를 가장 하단 구석에 두기 위해 먼저 추가
-		map.addControl(new MouseCoordinatesControl(), "top-right");
+		map.addControl(new MouseCoordinatesControl(), "bottom-right");
 
 		// [2] geolocate 이벤트 수정
         geolocate.on("geolocate", (e) => {
