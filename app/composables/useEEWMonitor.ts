@@ -227,6 +227,9 @@ export const useEEWMonitor = () => {
 			// ----- 기존 setInterval 내부 로직을 여기에 그대로 넣습니다 -----
 			if (!simulatedTime) return;
 
+            // [1] responseDate 변수 스코프를 상위로 올려서 eew 처리 로직에서도 쓸 수 있게 함
+            let responseDate: Date | null = null;
+
 			// [핵심 1] 워커가 보낸 신호를 처리할 때마다 '시간 검증' 수행
             // 이유: iOS에서 백그라운드 후 복귀 시, 워커가 밀린 틱을 한꺼번에 보내거나
             // 멈췄던 시점부터 다시 시작할 수 있음. 이때 실제 시간과 비교해야 함.
@@ -265,15 +268,13 @@ export const useEEWMonitor = () => {
                     return r.json();
                 });
 
-				// [변경] 응답받은 timestamp를 사용하여 화면 시간 업데이트
-				// eew 데이터 유무와 상관없이 서버가 해당 시간을 처리했으므로 시간을 갱신함
-				if (response.timestamp) {
-					const responseDate = parseRequestTime(response.timestamp);
-					if (responseDate) {
-						currentDisplayTime.value =
-							formatDateToDisplay(responseDate);
-					}
-				}
+				// [변경] 응답받은 timestamp 처리
+                if (response.timestamp) {
+                    responseDate = parseRequestTime(response.timestamp);
+                    if (responseDate) {
+                        currentDisplayTime.value = formatDateToDisplay(responseDate);
+                    }
+                }
 
 				// 1. EEW 데이터 처리
 				if (response.eew) {
@@ -284,18 +285,47 @@ export const useEEWMonitor = () => {
 					// 없다면 origin_time을 식별자로 사용.
 					const currentId =
 						incomingEEW.report_id || incomingEEW.origin_time;
+                    
+                    // --- [NEW] 시간 차이 계산 로직 추가 ---
+                    let isRecentEvent = false;
+                    
+                    // 지진 발생 시간 파싱
+                    const originDate = parseRequestTime(incomingEEW.origin_time);
 
-					// 데이터가 유효하고(취소가 아니고), 이전에 받은 ID와 다를 때
-					if (
-						currentId &&
-						lastEventId.value !== currentId &&
-						incomingEEW.is_cancel !== true
-					) {
-						lastEventId.value = currentId; // ID 갱신
-						sendNotification(incomingEEW); // 알림 발송
+                    if (responseDate && originDate) {
+                        // 서버 시간 - 발생 시간 (밀리초 단위)
+                        const diffMs = responseDate.getTime() - originDate.getTime();
+                        
+                        // 차이가 5초(5000ms) 이내이고, 미래 시간이 아닐 때 (혹은 약간의 오차 허용)
+                        // 0보다 작으면(미래) 데이터 오류일 수 있으나, 일단 5초 이내 차이만 확인
+                        if (diffMs >= 0 && diffMs <= 5000) {
+                            isRecentEvent = true;
+                        }
+                    }
+                    // ------------------------------------
 
-						// (옵션) 효과음 재생을 원하면 여기서 playSound() 호출
-					}
+                    // 데이터가 유효하고, ID가 다르고, 취소가 아니며, 
+                    // [NEW] "최근 5초 이내 발생한 건"일 경우에만 알림 발송
+                    if (
+                        currentId &&
+                        lastEventId.value !== currentId &&
+                        incomingEEW.is_cancel !== true &&
+                        isRecentEvent // <--- 여기에 조건 추가
+                    ) {
+                        lastEventId.value = currentId; // ID 갱신
+                        sendNotification(incomingEEW); // 알림 발송
+                    } 
+                    // [추가] 만약 5초가 지났지만 새로운 ID라면? (알림은 안 보내고 데이터만 갱신할지 결정)
+                    // 현재 로직상으로는 알림 조건에만 isRecentEvent를 넣었으므로,
+                    // 알림은 안 가지만 아래 eewData.value 갱신은 정상적으로 이루어집니다.
+                    else if (
+                         currentId &&
+                         lastEventId.value !== currentId
+                    ) {
+                         // 알림은 스킵하지만 중복 방지를 위해 ID는 업데이트 해주는 것이 좋습니다.
+                         // 그렇지 않으면 나중에 시간이 맞아도 ID가 null이라 꼬일 수 있음
+                         lastEventId.value = currentId;
+                    }
 
 					eewData.value = incomingEEW;
 					connectionStatus.value = "live";
