@@ -1,5 +1,5 @@
 <template>
-	<UApp>
+	<UApp :toaster="toaster">
 		<Analytics/>
 		<SpeedInsights/>
 		<VitePwaManifest />
@@ -11,4 +11,5 @@
 <script setup lang="ts">
 import { Analytics } from '@vercel/analytics/nuxt'
 import { SpeedInsights } from "@vercel/speed-insights/nuxt"
+const toaster = { duration: 3000 }
 </script>
