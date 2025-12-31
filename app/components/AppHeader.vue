@@ -1,6 +1,7 @@
 <template>
 	<UHeader title="JP EEW Viewer" mode="drawer">
 		<template #right>
+			<UColorModeSwitch />
 			<UTooltip text="Open on GitHub">
 				<UButton
 					color="neutral"

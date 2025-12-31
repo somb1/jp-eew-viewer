@@ -1,14 +1,12 @@
 <template>
 	<div
-		class="pointer-events-none mb-5 ml-2 flex w-[380px] max-w-[90vw] flex-col items-start gap-3 font-sans"
+		class="pointer-events-none mb-5 ml-2 flex w-[380px] max-w-[90vw] flex-col items-start gap-2 font-sans"
 	>
 		<div class="pointer-events-auto w-full">
 			<div
 				class="flex w-full items-center justify-between gap-3 rounded-full border border-white/10 bg-black/70 px-4 py-2 text-white shadow-lg backdrop-blur-md transition-all hover:bg-black/80"
 			>
-				<div
-					class="flex items-center gap-2 font-mono text-xs font-semibold"
-				>
+				<div class="flex items-center gap-2 font-mono text-xs font-semibold">
 					<span class="relative flex h-2.5 w-2.5">
 						<span
 							v-if="status === 'live' || status === 'syncing'"
@@ -59,13 +57,13 @@
 		<div class="pointer-events-auto w-full transition-all duration-300">
 			<div
 				v-if="status === 'error'"
-				class="flex items-center justify-center gap-2 rounded-lg border border-red-500/50 bg-red-950/80 p-3 text-red-100 backdrop-blur shadow-lg"
+				class="flex items-center justify-center gap-2 rounded-lg border border-red-500/50 bg-red-950/80 p-2.5 text-red-100 backdrop-blur shadow-lg"
 			>
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
 					viewBox="0 0 24 24"
 					fill="currentColor"
-					class="h-5 w-5 text-red-400"
+					class="h-4 w-4 text-red-400"
 				>
 					<path
 						fill-rule="evenodd"
@@ -73,131 +71,84 @@
 						clip-rule="evenodd"
 					/>
 				</svg>
-				<span class="text-sm font-bold tracking-wide"
-					>데이터 수신 오류</span
-				>
+				<span class="text-xs font-bold tracking-wide">수신 오류</span>
 			</div>
 
 			<div
 				v-else-if="!eewData"
-				class="flex items-center justify-center rounded-lg border border-gray-700 bg-gray-900/80 p-3 text-gray-300 backdrop-blur shadow-lg"
+				class="flex items-center justify-center rounded-lg border border-gray-800 bg-gray-900/80 p-2.5 text-gray-400 backdrop-blur shadow-lg"
 			>
-				<div class="mr-3 h-2 w-2 rounded-full bg-gray-400"></div>
-				<span class="text-sm font-semibold tracking-wide"
-					>데이터 수신 중...</span
-				>
+				<div class="mr-2 h-1.5 w-1.5 animate-pulse rounded-full bg-gray-500"></div>
+				<span class="text-xs font-medium tracking-wide">대기 중...</span>
 			</div>
 
 			<div
 				v-else-if="isEmptyResponse"
-				class="rounded-lg border border-gray-800 bg-black/60 p-3 text-center text-gray-400 backdrop-blur shadow-md"
+				class="hidden rounded-lg border border-gray-800 bg-black/40 p-2 text-center text-xs text-gray-500 backdrop-blur-sm shadow-sm"
 			>
-				<span class="text-sm font-medium"
-					>긴급지진속보는 발표되지 않았습니다</span
-				>
+				<span>특이사항 없음</span>
 			</div>
 
 			<div
 				v-else
-				class="overflow-hidden rounded-xl border-2 shadow-2xl backdrop-blur-md transition-all duration-300"
+				class="relative overflow-hidden rounded-xl border shadow-2xl backdrop-blur-md transition-all duration-300"
 				:class="[
 					isCancel
-						? 'border-gray-500 bg-gray-800/95'
-						: 'border-white/20 bg-gray-900/95',
+						? 'border-gray-600 bg-gray-800/90'
+						: 'border-red-500/30 bg-gray-900/90 shadow-red-900/20',
 				]"
 			>
 				<div
-					class="flex items-center justify-between px-4 py-2 text-white"
-					:class="[
-						isCancel
-							? 'bg-gray-600'
-							: 'bg-gradient-to-r from-red-600 to-red-700',
-					]"
-				>
-					<div class="flex items-center gap-2">
-						<span v-if="!isCancel" class="relative flex h-3 w-3">
-							<span
-								class="absolute inline-flex h-full w-full rounded-full bg-white opacity-75"
-							></span>
-							<span
-								class="relative inline-flex h-3 w-3 rounded-full bg-red-200"
-							></span>
-						</span>
-						<span class="text-lg font-black tracking-tight">
-							{{
-								isCancel
-									? "긴급지진속보 (취소)"
-									: "긴급지진속보 (예보)"
-							}}
-						</span>
-					</div>
-					<span
-						class="rounded bg-black/20 px-2 py-0.5 text-xs font-bold backdrop-blur-sm"
-					>
-						{{ isFinal ? "최종보" : `제 ${eewData.report_num} 보` }}
-					</span>
-				</div>
+					class="absolute inset-y-0 left-0 w-1"
+					:class="isCancel ? 'bg-gray-500' : 'bg-red-600'"
+				></div>
 
-				<div class="flex gap-4 p-4 text-white">
+				<div class="flex items-center gap-3 p-3 pl-4">
 					<div
-						class="flex w-20 flex-col items-center justify-center rounded-lg shadow-inner"
+						class="flex h-12 w-12 flex-shrink-0 flex-col items-center justify-center rounded-lg shadow-sm"
 						:class="[
 							isCancel
-								? 'bg-gray-500 text-gray-200'
-								: 'bg-yellow-400 text-black',
+								? 'bg-gray-600 text-gray-300'
+								: 'bg-gradient-to-br from-yellow-400 to-orange-500 text-white',
 						]"
 					>
-						<span class="mt-1 text-[0.65rem] font-bold opacity-80"
-							>최대진도</span
-						>
-
+						<span class="text-[0.55rem] font-bold opacity-90 leading-none mb-0.5">진도</span>
 						<span
-							class="mb-1 block w-full text-center font-mono text-5xl font-black leading-none"
-							:class="
-								displayIntensity === '-'
-									? 'tracking-normal'
-									: 'tracking-tighter'
-							"
+							class="font-mono text-2xl font-black leading-none tracking-tighter shadow-black drop-shadow-sm"
 						>
 							{{ displayIntensity }}
 						</span>
 					</div>
 
-					<div class="flex flex-1 flex-col justify-center">
-						<div
-							class="text-2xl font-black leading-tight tracking-tight drop-shadow-md"
-						>
-							{{ eewData.region_name }}
-						</div>
-
-						<div class="mb-2 text-xs font-medium text-gray-400">
-							{{ formatOriginTime(eewData.origin_time) }} 발생
-						</div>
-
-						<div
-							class="flex items-baseline gap-4 border-t border-white/10 pt-2"
-						>
-							<div class="flex items-baseline gap-1">
-								<span
-									class="text-sm font-bold"
-									:class="
-										isCancel
-											? 'text-gray-400'
-											: 'text-yellow-400'
-									"
-									>M</span
-								>
-								<span class="font-mono text-xl font-bold">{{
-									eewData.magunitude
-								}}</span>
-							</div>
-							<div
-								class="flex items-baseline gap-1 text-gray-300"
+					<div class="flex min-w-0 flex-1 flex-col justify-center">
+						<div class="flex items-center gap-2 mb-1">
+							<span
+								class="flex-shrink-0 rounded px-1.5 py-0.5 text-[10px] font-bold text-white shadow-sm"
+								:class="isCancel ? 'bg-gray-500' : 'bg-red-600'"
 							>
-								<span class="text-xs">깊이</span>
-								<span class="font-mono text-lg font-bold">{{
-									eewData.depth
-								}}</span>
+								{{ isCancel ? "취소" : "속보" }}
+								<span class="opacity-75">| {{ isFinal ? "최종" : `#${eewData.report_num}` }}</span>
+							</span>
+							<span
+								class="truncate text-lg font-bold leading-tight text-white drop-shadow-md"
+							>
+								{{ eewData.region_name }}
+							</span>
+						</div>
+
+						<div class="flex items-center gap-3 text-xs font-medium text-gray-300">
+							<span class="font-mono text-gray-400">
+                                {{ formatOriginTime(eewData.origin_time).split(" ")[1] }}
+                            </span>
+							<div class="h-3 w-px bg-gray-700"></div>
+							<div class="flex items-baseline gap-1">
+								<span :class="isCancel ? 'text-gray-500' : 'text-yellow-500'">M</span>
+								<span class="font-mono font-bold text-white">{{ eewData.magunitude }}</span>
+							</div>
+							<div class="h-3 w-px bg-gray-700"></div>
+							<div class="flex items-baseline gap-1">
+								<span class="text-gray-500">깊이</span>
+								<span class="font-mono font-bold text-white">{{ eewData.depth }}</span>
 							</div>
 						</div>
 					</div>
@@ -220,13 +171,8 @@ defineEmits<{
 	(e: "sync"): void;
 }>();
 
-// [수정됨] 데이터가 없으면(null/undefined) false를 반환해야 함.
-// 그래야 템플릿 상단의 v-if="!eewData" (로딩/에러 처리) 쪽으로 넘어갈 수 있음.
 const isEmptyResponse = computed(() => {
-	// 데이터 자체가 없으면 '평상시(정보 없음)'라고 단정 지을 수 없음 -> false 반환
 	if (!props.eewData) return false;
-
-	// 데이터가 있을 때, 메시지를 확인하여 판단
 	const msg = props.eewData.result?.message || "";
 	return msg.includes("データがありません");
 });
@@ -249,7 +195,7 @@ const displayIntensity = computed(() => {
 
 const formatOriginTime = (rawTime: string) => {
 	if (!rawTime || rawTime.length < 14) return rawTime;
-	const Y = rawTime.substring(0, 4);	
+	const Y = rawTime.substring(0, 4);
 	const M = rawTime.substring(4, 6);
 	const D = rawTime.substring(6, 8);
 	const h = rawTime.substring(8, 10);
