@@ -47,28 +47,54 @@ export const useEEWMonitor = () => {
 		}
 	};
 
-	// [MODIFIED] 알림 토글 함수 (권한 요청 + 켜기/끄기 통합)
-    const toggleNotification = async () => {
-        // 1. 권한이 없는 경우 (default) -> 권한 요청
-        if (notificationPermission.value === 'default') {
-            const permission = await Notification.requestPermission();
-            notificationPermission.value = permission;
+    // [수정] 권한 상태 확인 함수 (외부 노출용 아님, 내부 사용)
+    const updatePermissionState = () => {
+        if (typeof Notification !== "undefined") {
+            notificationPermission.value = Notification.permission;
+        }
+    };
 
-            if (permission === 'granted') {
-                isNotificationActive.value = true;
-                toast.add({ title: "알림이 활성화되었습니다." });
-            } else {
-                toast.add({ title: "알림 권한이 거부되었습니다." });
-                isNotificationActive.value = false;
+    // [수정] 알림 토글 함수 (핵심 로직 변경)
+    const toggleNotification = async () => {
+        // 0. 브라우저 지원 여부 확인
+        if (typeof Notification === "undefined") {
+            toast.add({ title: "이 기기는 알림을 지원하지 않습니다.", icon: "i-heroicons-x-circle" });
+            return;
+        }
+
+        // [핵심] ref 값이 아닌 '현재' 브라우저의 실제 권한 상태를 즉시 읽어옴
+        // iOS는 이 값이 실시간으로 변동될 수 있으므로 클릭 시점에 다시 읽어야 함
+        const currentPerm = Notification.permission;
+        notificationPermission.value = currentPerm; // 상태 동기화
+
+        // 1. 권한이 없는 경우 (default) -> 권한 요청
+        if (currentPerm === 'default') {
+            try {
+                // [중요] iOS에서는 이 함수가 사용자 제스처(클릭) 스택에서 즉시 실행되어야 함
+                const permission = await Notification.requestPermission();
+                notificationPermission.value = permission;
+
+                if (permission === 'granted') {
+                    isNotificationActive.value = true;
+                    toast.add({ title: "알림이 활성화되었습니다.", icon: "i-heroicons-bell" });
+                } else {
+                    // 사용자가 '허용 안함'을 눌렀거나 무시한 경우
+                    toast.add({ title: "알림 권한이 거부되었습니다.", icon: "i-heroicons-bell-slash" });
+                    isNotificationActive.value = false;
+                }
+            } catch (err) {
+                console.error("Notification permission error:", err);
+                toast.add({ title: "권한 요청 중 오류가 발생했습니다." });
             }
             return;
         }
 
-        // 2. 권한이 거부된 경우 (denied)
-        if (notificationPermission.value === 'denied') {
-            toast.add({ 
-                title: "브라우저 설정에서 알림 권한을 허용해주세요.", 
-                icon: "i-heroicons-x-circle",
+        // 2. 권한이 이미 거부된 경우 (denied)
+        if (currentPerm === 'denied') {
+            toast.add({
+                title: "알림 권한이 차단되어 있습니다.",
+                description: "아이폰 설정 > 알림 > 이 앱(웹) 선택 > '알림 허용'을 켜주세요.",
+                icon: "i-heroicons-exclamation-circle",
             });
             isNotificationActive.value = false;
             return;
@@ -76,7 +102,7 @@ export const useEEWMonitor = () => {
 
         // 3. 권한이 이미 있는 경우 (granted) -> 스위치 토글
         isNotificationActive.value = !isNotificationActive.value;
-        
+
         toast.add({
             title: isNotificationActive.value ? "알림을 켰습니다." : "알림을 껐습니다.",
             icon: isNotificationActive.value ? "i-heroicons-bell" : "i-heroicons-bell-slash",
