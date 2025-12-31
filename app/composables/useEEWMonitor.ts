@@ -110,9 +110,13 @@ export const useEEWMonitor = () => {
 			worker.terminate();
 		}
 
-		// 워커 생성 (public 폴더의 파일 로드)
-        worker = new Worker("/timer-worker.js");
-		
+		// [변경] Vite의 import.meta.url 기능을 사용하여 TS 워커를 로드
+        // Nuxt/Vite가 이 코드를 보고 .ts를 .js로 컴파일하여 번들링해줍니다.
+        worker = new Worker(
+            new URL('~/assets/timer-worker.ts', import.meta.url), 
+            { type: 'module' } // TS 워커는 모듈 타입으로 로드해야 함
+        );
+
 		// 워커로부터 메시지(tick)를 받을 때마다 실행되는 함수
 		worker.onmessage = async () => {
 			// ----- 기존 setInterval 내부 로직을 여기에 그대로 넣습니다 -----
