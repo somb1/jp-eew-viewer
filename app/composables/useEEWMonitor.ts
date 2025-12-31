@@ -311,7 +311,6 @@ export const useEEWMonitor = () => {
 						incomingEEW.report_id || incomingEEW.origin_time;
 
 					// [신규 지진 판별 로직]
-					// 서버 응답 시간과 지진 발생 시간의 차이가 5초 이내여야 '실시간'으로 간주
 					let isRecentEvent = false;
 					const originDate = parseRequestTime(
 						incomingEEW.origin_time
