@@ -14,8 +14,9 @@ export const useEEWMonitor = () => {
 	// 포인트 데이터 상태
 	const stationPointsData = ref<any>(null);
 
-	// 내부 변수
-	let timerId: any = null;
+	// [변경] timerId 대신 worker 변수 사용
+	// let timerId: any = null; (삭제 또는 주석)
+	let worker: Worker | null = null;
 	let simulatedTime: Date | null = null;
 	let isFetching = false;
 
@@ -104,9 +105,17 @@ export const useEEWMonitor = () => {
 
 	// [로직 2] 루프 실행
 	const startLoop = () => {
-		if (timerId) clearInterval(timerId);
+		// 이미 워커가 있다면 정리
+		if (worker) {
+			worker.terminate();
+		}
 
-		timerId = setInterval(async () => {
+		// 워커 생성 (public 폴더의 파일 로드)
+        worker = new Worker("/timer-worker.js");
+		
+		// 워커로부터 메시지(tick)를 받을 때마다 실행되는 함수
+		worker.onmessage = async () => {
+			// ----- 기존 setInterval 내부 로직을 여기에 그대로 넣습니다 -----
 			if (!simulatedTime) return;
 
 			// 내부 시간 증가
@@ -193,20 +202,32 @@ export const useEEWMonitor = () => {
 			} finally {
 				isFetching = false;
 			}
-		}, 1000);
+		};
+		// 워커 시작 신호 전송
+		worker.postMessage("start");
 	};
+	// [로직 3] 중단 및 정리
+    const stopEEW = () => {
+        if (worker) {
+            worker.postMessage("stop"); // 워커 타이머 중지
+            worker.terminate(); // 워커 프로세스 종료
+            worker = null;
+        }
+        isFetching = false;
+    };
 
-	// [로직 3] 수동/초기화 핸들러 (기존과 동일)
-	const handleManualSync = async () => {
-		if (connectionStatus.value === "syncing") return;
-		if (timerId) clearInterval(timerId);
-		isFetching = false;
-		connectionStatus.value = "syncing";
-		const success = await syncFromServer();
-		if (success) {
-			startLoop();
-		}
-	};
+    // [변경] 수동 동기화 핸들러
+    const handleManualSync = async () => {
+        if (connectionStatus.value === "syncing") return;
+        stopEEW(); // 기존 타이머/워커 정리
+        
+        isFetching = false;
+        connectionStatus.value = "syncing";
+        const success = await syncFromServer();
+        if (success) {
+            startLoop();
+        }
+    };
 
 	const initEEW = async () => {
 		connectionStatus.value = "syncing";
@@ -217,14 +238,14 @@ export const useEEWMonitor = () => {
 		}
 	};
 
-	const stopEEW = () => {
-		if (timerId) clearInterval(timerId);
-		isFetching = false;
-	};
-
 	// 마운트 시 현재 권한 상태 확인
-    onMounted(() => {
-        checkNotificationPermission();
+	onMounted(() => {
+		checkNotificationPermission();
+	});
+
+	// 컴포넌트 언마운트 시 워커 정리 (안전장치)
+    onBeforeUnmount(() => {
+        stopEEW();
     });
 
 	return {
