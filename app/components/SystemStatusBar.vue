@@ -34,24 +34,20 @@
 
                     <div class="h-3 w-px bg-white/20 mx-0.5 flex-shrink-0"></div>
 
-                    <span class="whitespace-nowrap text-[10px] text-yellow-400/90 tracking-tight">
+                    <button 
+                        @click="toggleSettings"
+                        class="flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] sm:text-xs font-bold text-yellow-400/90 hover:bg-white/10 hover:text-yellow-300 transition-colors tracking-tight outline-none"
+                    >
                         {{ currentSettingsDisplay }}
-                    </span>
+                        <UIcon 
+                            name="i-heroicons-chevron-down-20-solid" 
+                            class="h-3 w-3 opacity-70 transition-transform duration-300"
+                            :class="{ 'rotate-180': showSettings }"
+                        />
+                    </button>
                 </div>
 
                 <div class="flex items-center gap-1 flex-shrink-0">
-                    <button
-                        @click="toggleSettings"
-                        class="group flex h-6 w-6 items-center justify-center rounded-full transition-colors hover:bg-white/10"
-                        :class="showSettings ? 'text-white bg-white/20 shadow-[0_0_10px_rgba(255,255,255,0.2)]' : 'text-gray-400 hover:text-white'"
-                    >
-                        <UIcon 
-                            name="i-heroicons-cog-6-tooth-20-solid" 
-                            class="h-4 w-4 transition-transform duration-500" 
-                            :class="{'rotate-180': showSettings}" 
-                        />
-                    </button>
-
                     <button
                         @click="$emit('trigger-location')"
                         class="group flex h-6 w-6 items-center justify-center rounded-full transition-all duration-300 hover:bg-white/10"
@@ -122,7 +118,7 @@
                 class="pointer-events-auto w-full rounded-xl border border-white/10 bg-black/80 p-4 shadow-xl backdrop-blur-md"
             >
                 <div class="flex items-center justify-between mb-3 border-b border-white/10 pb-2">
-                    <span class="text-xs font-bold text-gray-300 flex items-center gap-1">
+                    <span class="text-xs sm:text-sm font-bold text-gray-300 flex items-center gap-1">
                         <UIcon name="i-heroicons-adjustments-horizontal-20-solid" class="w-3 h-3" />
                         데이터 시각화 설정
                     </span>
@@ -133,11 +129,11 @@
 
                 <div class="flex gap-3">
                     <div class="space-y-1.5 flex-[1.5]">
-                        <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider pl-1">Data Type</label>
+                        <label class="text-[10px] sm:text-xs font-bold text-gray-400 uppercase tracking-wider pl-1">Data Type</label>
                         <div class="relative">
                             <select 
                                 v-model="proxyType"
-                                class="w-full appearance-none rounded-lg bg-white/5 border border-white/10 px-3 py-2 text-xs text-white focus:border-yellow-500 focus:outline-none focus:ring-1 focus:ring-yellow-500 transition-colors hover:bg-white/10 cursor-pointer"
+                                class="w-full appearance-none rounded-lg bg-white/5 border border-white/10 px-3 py-2 text-xs sm:text-sm text-white focus:border-yellow-500 focus:outline-none focus:ring-1 focus:ring-yellow-500 transition-colors hover:bg-white/10 cursor-pointer"
                             >
                                 <option v-for="(label, key) in TYPE_LABELS" :key="key" :value="key" class="bg-gray-900 text-white">
                                     {{ label }}
@@ -150,13 +146,13 @@
                     </div>
 
                     <div class="space-y-1.5 flex-1">
-                        <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider pl-1">Source</label>
+                        <label class="text-[10px] sm:text-xs font-bold text-gray-400 uppercase tracking-wider pl-1">Source</label>
                         <div class="flex gap-2 rounded-lg bg-white/5 p-1 border border-white/10 h-[34px]">
                             <button 
                                 v-for="(label, key) in SOURCE_LABELS" 
                                 :key="key"
                                 @click="proxySource = key"
-                                class="flex-1 rounded text-xs font-medium transition-all"
+                                class="flex-1 rounded text-xs sm:text-sm font-medium transition-all"
                                 :class="proxySource === key ? 'bg-gray-600 text-white shadow-md' : 'text-gray-400 hover:text-white hover:bg-white/5'"
                             >
                                 {{ key === 's' ? '지표' : '지중' }}
