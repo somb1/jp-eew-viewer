@@ -7,8 +7,8 @@
 					:current-time="currentDisplayTime"
 					:status="connectionStatus"
 					@sync="handleManualSync"
-					:notification-enabled="isNotificationEnabled"
-					@request-permission="requestNotificationPermission"
+					:notification-enabled="finalNotificationState"
+                    @toggle-notification="toggleNotification"
 				/>
 			</Teleport>
 		</template>
@@ -41,7 +41,8 @@ const {
 	handleManualSync,
 	initEEW,
 	stopEEW,
-	requestNotificationPermission,
+	toggleNotification, // [NEW] 가져오기
+    isNotificationActive, // [NEW] 가져오기
 	notificationPermission,
 } = useEEWMonitor();
 
@@ -117,10 +118,11 @@ watch(
 	}
 );
 
-// 권한이 'granted'이면 true
-const isNotificationEnabled = computed(
-	() => notificationPermission.value === "granted"
-);
+// [MODIFIED] 최종 알림 상태 계산
+// 브라우저 권한도 있고(granted) + 앱 내부 스위치도 켜져있어야(true) -> true
+const finalNotificationState = computed(() => {
+    return notificationPermission.value === "granted" && isNotificationActive.value;
+});
 </script>
 
 <style scoped>

@@ -35,30 +35,19 @@
 
 				<div class="flex items-center gap-1">
 					<button
-						@click="$emit('request-permission')"
-						:title="notificationEnabled ? '알림 켜짐' : '알림 켜기'"
-						class="group flex h-6 w-6 items-center justify-center rounded-full transition-colors hover:bg-white/10"
+						@click="$emit('toggle-notification')"
+						:title="notificationEnabled ? '알림 끄기' : '알림 켜기'"
+						class="group flex h-6 w-6 items-center justify-center rounded-full transition-all duration-300 hover:bg-white/10"
 						:class="[
 							notificationEnabled
-								? 'text-yellow-400 bg-white/5'
+								? 'bg-white/5 text-yellow-400' 
 								: 'text-gray-400 hover:text-yellow-400',
 						]"
 					>
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							viewBox="0 0 20 20"
-							fill="currentColor"
-							class="h-4 w-4"
-						>
-							<path
-								v-if="notificationEnabled"
-								d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z"
-							/>
-							<path
-								v-else
-								d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z"
-							/>
-						</svg>
+                        <UIcon 
+                            :name="notificationEnabled ? 'i-heroicons-bell-alert-20-solid' : 'i-heroicons-bell-slash-20-solid'" 
+                            class="h-4 w-4 transition-transform group-hover:scale-110"
+                        />
 					</button>
 
 					<div class="h-3 w-px bg-white/20"></div>
@@ -68,7 +57,7 @@
 						:disabled="status === 'syncing'"
 						class="group flex items-center gap-1.5 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-gray-400 transition-colors hover:bg-white/10 hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
 					>
-						<svg
+                        <svg
 							xmlns="http://www.w3.org/2000/svg"
 							viewBox="0 0 20 20"
 							fill="currentColor"
@@ -92,18 +81,7 @@
 				v-if="status === 'error'"
 				class="flex items-center justify-center gap-2 rounded-lg border border-red-500/50 bg-red-950/80 p-2.5 text-red-100 backdrop-blur shadow-lg"
 			>
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					viewBox="0 0 24 24"
-					fill="currentColor"
-					class="h-4 w-4 text-red-400"
-				>
-					<path
-						fill-rule="evenodd"
-						d="M9.401 3.003c1.155-2 4.043-2 5.197 0l7.355 12.748c1.154 2-.29 4.5-2.599 4.5H4.645c-2.309 0-3.752-2.5-2.598-4.5L9.4 3.003zM12 8.25a.75.75 0 01.75.75v3.75a.75.75 0 01-1.5 0V9a.75.75 0 01.75-.75zm0 8.25a.75.75 0 100-1.5.75.75 0 000 1.5z"
-						clip-rule="evenodd"
-					/>
-				</svg>
+                <UIcon name="i-heroicons-exclamation-circle-20-solid" class="h-4 w-4 text-red-400" />
 				<span class="text-xs font-bold tracking-wide">수신 오류</span>
 			</div>
 
@@ -220,12 +198,12 @@ const props = defineProps<{
 	eewData: any;
 	currentTime: string;
 	status: string;
-	notificationEnabled?: boolean; // [NEW] prop 추가 (옵셔널)
+	notificationEnabled?: boolean;
 }>();
 
 defineEmits<{
 	(e: "sync"): void;
-	(e: "request-permission"): void; // [NEW] 이벤트 정의 추가
+	(e: "toggle-notification"): void;
 }>();
 
 const isEmptyResponse = computed(() => {

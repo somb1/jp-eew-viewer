@@ -1,3 +1,5 @@
+import { useStorage } from "@vueuse/core";
+
 export const useEEWMonitor = () => {
 	// 상태 변수
 	const eewData = ref<any>(null);
@@ -27,9 +29,13 @@ export const useEEWMonitor = () => {
 	let simulatedTime: Date | null = null;
 	let isFetching = false;
 
-	// [NEW] 알림 권한 상태 저장 (기본값: 지원하지 않거나 아직 모름)
-	const notificationPermission = ref<NotificationPermission>("default");
+	// [NEW] 앱 내부 알림 스위치 (로컬 스토리지에 저장하여 설정 유지)
+    // 브라우저 권한이 있어도 이 값이 false면 알림을 안 보냄
+    const isNotificationActive = useStorage<boolean>("eew-notification-active", false);
 
+    // [NEW] 알림 권한 상태 저장
+    const notificationPermission = ref<NotificationPermission>("default");
+	
 	// [NEW] 권한 상태 확인 함수
 	const checkNotificationPermission = () => {
 		if (typeof Notification !== "undefined") {
@@ -37,44 +43,72 @@ export const useEEWMonitor = () => {
 		}
 	};
 
-	// [NEW] 알림 발송 함수
-	const sendNotification = (eew: any) => {
-		const title = `[지진 속보] ${eew.region_name} 규모 ${eew.magunitude}`;
-		const body = `깊이 ${eew.depth}, 최대 진도 ${eew.calcintensity}`;
+	// [MODIFIED] 알림 토글 함수 (권한 요청 + 켜기/끄기 통합)
+    const toggleNotification = async () => {
+        // 1. 권한이 없는 경우 (default) -> 권한 요청
+        if (notificationPermission.value === 'default') {
+            const permission = await Notification.requestPermission();
+            notificationPermission.value = permission;
 
-		// 1. Nuxt UI Toast (앱 내부 알림)
-		toast.add({
-			title: "지진 속보 수신",
-			description: title,
-			icon: "i-heroicons-exclamation-triangle",
-			color: "neutral",
-		});
+            if (permission === 'granted') {
+                isNotificationActive.value = true;
+                toast.add({ title: "알림이 활성화되었습니다." });
+            } else {
+                toast.add({ title: "알림 권한이 거부되었습니다." });
+                isNotificationActive.value = false;
+            }
+            return;
+        }
 
-		// 2. 브라우저 알림 (앱이 백그라운드일 때 유용)
-		if (
-			typeof Notification !== "undefined" &&
-			Notification.permission === "granted"
-		) {
-			// 모바일에서는 서비스 워커가 필요할 수 있으나, 데스크탑/안드로이드 일부 환경에서는 바로 작동
-			new Notification("지진 조기 경보 (EEW)", {
-				body: `${title}\n${body}`,
-				icon: "/icon-192x192.png", // public 폴더의 아이콘 경로
-				tag: eew.report_id || eew.origin_time, // 태그가 같으면 알림이 쌓이지 않고 갱신됨
-				requireInteraction: true, // 사용자가 닫을 때까지 유지
-			});
-		}
-	};
+        // 2. 권한이 거부된 경우 (denied)
+        if (notificationPermission.value === 'denied') {
+            toast.add({ 
+                title: "브라우저 설정에서 알림 권한을 허용해주세요.", 
+                icon: "i-heroicons-x-circle",
+            });
+            isNotificationActive.value = false;
+            return;
+        }
 
-	const requestNotificationPermission = async () => {
-		if (typeof Notification !== "undefined") {
-			const permission = await Notification.requestPermission();
-			notificationPermission.value = permission; // [NEW] 상태 업데이트
+        // 3. 권한이 이미 있는 경우 (granted) -> 스위치 토글
+        isNotificationActive.value = !isNotificationActive.value;
+        
+        toast.add({
+            title: isNotificationActive.value ? "알림을 켰습니다." : "알림을 껐습니다.",
+            icon: isNotificationActive.value ? "i-heroicons-bell" : "i-heroicons-bell-slash",
+            color: "neutral"
+        });
+    };
 
-			if (permission === "granted") {
-				toast.add({ title: "알림이 활성화되었습니다." });
-			}
-		}
-	};
+	// [MODIFIED] 알림 발송 함수 수정
+    const sendNotification = (eew: any) => {
+        // [CHECK] 앱 내부 스위치가 꺼져있으면 발송 중단
+        if (!isNotificationActive.value) return;
+
+        const title = `[지진 속보] ${eew.region_name} 규모 ${eew.magunitude}`;
+        const body = `깊이 ${eew.depth}, 최대 진도 ${eew.calcintensity}`;
+
+        // 1. Nuxt UI Toast
+        toast.add({
+            title: "지진 속보 수신",
+            description: title,
+            icon: "i-heroicons-exclamation-triangle",
+            color: "neutral",
+        });
+
+        // 2. 브라우저 알림
+        if (
+            typeof Notification !== "undefined" &&
+            Notification.permission === "granted"
+        ) {
+            new Notification("지진 조기 경보 (EEW)", {
+                body: `${title}\n${body}`,
+                icon: "/icon-192x192.png",
+                tag: eew.report_id || eew.origin_time,
+                requireInteraction: true,
+            });
+        }
+    };
 
 	// [헬퍼] request_time 문자열(YYYYMMDDHHmmss)을 Date 객체로 변환
 	const parseRequestTime = (timeStr: string): Date | null => {
@@ -354,7 +388,8 @@ export const useEEWMonitor = () => {
 		handleManualSync,
 		initEEW,
 		stopEEW,
-		requestNotificationPermission,
+		toggleNotification, // [NEW] export
+        isNotificationActive, // [NEW] export
 		notificationPermission,
 		visibility,
 	};
