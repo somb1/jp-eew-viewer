@@ -9,6 +9,9 @@ export const useEEWMonitor = () => {
 	// 클라이언트 시뮬레이션 시간과 실제 시간 차이가 이 값을 초과하면 재동기화 수행
 	const MAX_TIME_DRIFT = 3000;
 
+	// [추가] 클라이언트와 서버 시간의 초기 오차를 저장할 변수
+    let initialTimeOffset: number | null = null;
+
 	// =========================================================================================
 	// 2. 상태 변수 (Reactive State)
 	// =========================================================================================
@@ -213,6 +216,11 @@ export const useEEWMonitor = () => {
 
 			const newTime = new Date(latestRes.latest_time);
 			simulatedTime = newTime;
+
+			// [수정] 동기화 성공 시점의 "내 PC 시간"과 "서버 시간"의 차이를 기록합니다.
+            // 예: 내 시계가 서버보다 1분 빠르면 offset은 약 60000ms가 됨
+            initialTimeOffset = Date.now() - newTime.getTime();
+
 			currentDisplayTime.value = formatDateToDisplay(newTime);
 			lastErrorMessage.value = null;
 
@@ -262,16 +270,21 @@ export const useEEWMonitor = () => {
 		worker.onmessage = async () => {
 			if (!simulatedTime) return;
 
-			// 1. 시간 검증 (Time Drift Check)
-			// iOS 등에서 백그라운드 복귀 시 시간이 틀어지는 것을 방지
-			const now = new Date();
-			const drift = now.getTime() - simulatedTime.getTime();
+			// 1. 시간 검증 (Time Drift Check) 수정됨
+            const now = new Date();
+            
+            // 현재의 시간 차이 계산
+            const currentOffset = now.getTime() - simulatedTime.getTime();
+            
+            // [핵심] "초기 오차"와 "현재 오차"가 달라졌는지를 비교해야 합니다.
+            // 브라우저가 정상 작동 중이라면 currentOffset은 initialTimeOffset과 거의 비슷해야 합니다.
+            const driftChange = Math.abs(currentOffset - initialTimeOffset!);
 
-			if (Math.abs(drift) > MAX_TIME_DRIFT) {
-				console.warn(`[Drift] ${drift}ms. Forcing Sync.`);
-				handleManualSync(true); // 강제 재동기화
-				return;
-			}
+            if (driftChange > MAX_TIME_DRIFT) {
+                console.warn(`[Drift Detect] Change: ${driftChange}ms. Forcing Sync.`);
+                handleManualSync(true); // 강제 재동기화
+                return;
+            }
 
 			// 2. 내부 시간 1초 증가 및 API 파라미터 준비
 			simulatedTime.setSeconds(simulatedTime.getSeconds() + 1);
