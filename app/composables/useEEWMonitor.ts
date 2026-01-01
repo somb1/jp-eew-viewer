@@ -16,6 +16,12 @@ export const useEEWMonitor = () => {
 	// 2. 상태 변수 (Reactive State)
 	// =========================================================================================
 
+	// [추가] 리플레이 오프셋 (분 단위, 0 = 실시간)
+    const replayOffsetMinutes = ref(0);
+
+	// [추가] 리플레이 모드인지 판별하는 Computed
+    const isReplayMode = computed(() => replayOffsetMinutes.value > 0);
+
 	// [데이터 상태]
 	const eewData = ref<any>(null); // 현재 수신된 EEW 데이터
 	const stationPointsData = ref<any>(null); // 관측소(PGA/PGV 등) 지점 데이터
@@ -150,13 +156,15 @@ export const useEEWMonitor = () => {
 				: "i-heroicons-bell-slash",
 			color: "neutral",
 		});
-	};
+	};``
 
 	/**
 	 * 실제 알림 발송 처리
 	 */
-	const sendNotification = (eew: any) => {
-		if (!isNotificationActive.value) return; // 앱 설정 확인
+	// sendNotification 함수 수정: 리플레이 중에는 알림 발송 차단
+    const sendNotification = (eew: any) => {
+        if (isReplayMode.value) return; // [수정] 과거 데이터 조회 중 알림 방지
+        if (!isNotificationActive.value) return;
 
 		const title = `[지진 속보] ${eew.region_name} 규모 ${eew.magunitude}`;
 		const body = `깊이 ${eew.depth}, 최대 진도 ${eew.calcintensity}`;
@@ -297,7 +305,12 @@ export const useEEWMonitor = () => {
 			}
 
 			isFetching = true;
-			const timeParam = formatDateToParam(simulatedTime);
+
+			// [수정] API 요청용 시간 계산 (simulatedTime - replayOffsetMinutes)
+            // 실제 시간에서 오프셋만큼 뺀 시간을 계산합니다.
+            const targetDate = new Date(simulatedTime.getTime() - replayOffsetMinutes.value * 60 * 1000);
+            const timeParam = formatDateToParam(targetDate);
+
 			let responseDate: Date | null = null;
 
 			try {
@@ -493,5 +506,8 @@ export const useEEWMonitor = () => {
 		stopEEW,
 		handleManualSync,
 		visibility,
+
+		replayOffsetMinutes, // [추가] 외부로 노출
+        isReplayMode,         // [추가]
 	};
 };

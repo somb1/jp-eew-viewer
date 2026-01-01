@@ -6,39 +6,63 @@
 			<div
 				class="flex w-full items-center justify-between gap-3 rounded-full border border-white/10 bg-black/70 px-3 py-2 text-white shadow-lg backdrop-blur-md transition-all hover:bg-black/80"
 			>
-				<div
-					class="flex flex-1 items-center gap-2 overflow-hidden font-mono text-xs font-semibold"
-				>
-					<span class="relative flex h-2.5 w-2.5 flex-shrink-0">
-						<span
-							v-if="status === 'live' || status === 'syncing'"
-							class="absolute inline-flex h-full w-full rounded-full opacity-75"
-							:class="{
-								'bg-green-400': status === 'live',
-								'bg-yellow-400': status === 'syncing',
-							}"
-						></span>
-						<span
-							class="relative inline-flex h-2.5 w-2.5 rounded-full"
-							:class="{
-								'bg-green-500': status === 'live',
-								'bg-yellow-500': status === 'syncing',
-								'bg-red-500': status === 'error',
-								'bg-pink-500': status === 'test',
-							}"
-						></span>
-					</span>
-
-					<span
-						class="whitespace-nowrap tracking-wider text-gray-200"
+				<div class="flex flex-1 items-center gap-2 overflow-hidden">
+					<button
+						@click="toggleReplaySettings"
+						class="group flex items-center gap-2 font-mono text-xs font-semibold rounded-full px-2 py-1 transition-all outline-none text-left border border-transparent hover:bg-white/10 hover:border-white/5"
+						:class="
+							isReplayMode
+								? 'text-orange-300 bg-orange-500/10 border-orange-500/20'
+								: 'text-gray-200'
+						"
+						title="리플레이 설정 열기"
 					>
+						<span class="relative flex h-2.5 w-2.5 flex-shrink-0">
+							<span
+								v-if="status === 'live' || status === 'syncing'"
+								class="absolute inline-flex h-full w-full rounded-full opacity-75"
+								:class="{
+									'bg-green-400': status === 'live',
+									'bg-yellow-400': status === 'syncing',
+								}"
+							></span>
+							<span
+								class="relative inline-flex h-2.5 w-2.5 rounded-full"
+								:class="{
+									'bg-green-500': status === 'live',
+									'bg-yellow-500': status === 'syncing',
+									'bg-red-500': status === 'error',
+									'bg-pink-500': status === 'test',
+								}"
+							></span>
+						</span>
+
 						<span
-							v-if="splitTime.date"
-							class="hidden sm:inline mr-1"
-							>{{ splitTime.date }}</span
+							class="whitespace-nowrap tracking-wider flex items-center gap-1.5"
 						>
-						<span>{{ splitTime.time }}</span>
-					</span>
+							<span>
+								<span
+									v-if="splitTime.date"
+									class="hidden sm:inline mr-1 opacity-80"
+									>{{ splitTime.date }}</span
+								>
+								<span>{{ splitTime.time }}</span>
+							</span>
+
+							<span
+								v-if="isReplayMode"
+								class="text-[9px] font-bold bg-orange-500/20 px-2 py-0.5 rounded-full text-orange-300"
+							>
+								-{{ replayOffset }}m
+							</span>
+
+							<UIcon
+								name="i-heroicons-chevron-down-20-solid"
+								class="w-3 h-3 opacity-50 transition-transform group-hover:opacity-100 duration-300"
+								:class="{ 'rotate-180': showReplaySettings }"
+							/>
+						</span>
+					</button>
 
 					<div
 						class="h-3 w-px bg-white/20 mx-0.5 flex-shrink-0"
@@ -128,8 +152,110 @@
 			leave-to-class="opacity-0 -translate-y-2"
 		>
 			<div
+				v-if="showReplaySettings"
+				class="pointer-events-auto mt-1 w-full rounded-lg border border-orange-500/30 bg-black/90 p-3 shadow-xl backdrop-blur-md z-40"
+			>
+				<div class="flex items-center justify-between mb-2">
+					<div class="flex items-center gap-2">
+						<span
+							class="text-[11px] font-bold text-gray-400 flex items-center gap-1"
+						>
+							<UIcon
+								name="i-heroicons-clock-20-solid"
+								class="w-3 h-3"
+							/>
+							Replay
+						</span>
+						<span
+							class="font-mono text-[11px] font-bold px-1.5 py-0.5 rounded bg-white/5"
+							:class="
+								isReplayMode
+									? 'text-orange-400'
+									: 'text-green-400'
+							"
+						>
+							{{ isReplayMode ? `-${replayOffset}m` : "LIVE" }}
+						</span>
+					</div>
+					<button
+						@click="showReplaySettings = false"
+						class="text-gray-500 hover:text-white transition-colors"
+					>
+						<UIcon
+							name="i-heroicons-x-mark-20-solid"
+							class="w-4 h-4"
+						/>
+					</button>
+				</div>
+
+				<div class="relative w-full flex items-center h-4 mb-1">
+					<div
+						class="absolute w-full h-1 bg-gray-700/50 rounded-full overflow-hidden"
+					>
+						<div
+							class="h-full bg-gradient-to-r from-orange-900/50 to-orange-500 transition-all duration-300"
+							:style="{ width: `${(timelineValue / 60) * 100}%` }"
+						></div>
+					</div>
+					<input
+						type="range"
+						v-model.number="timelineValue"
+						min="0"
+						max="60"
+						step="1"
+						class="relative w-full h-4 bg-transparent appearance-none cursor-pointer z-10 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-[3px] [&::-webkit-slider-thumb]:border-orange-500 [&::-webkit-slider-thumb]:shadow-[0_0_8px_rgba(249,115,22,0.8)] [&::-webkit-slider-thumb]:transition-transform [&::-webkit-slider-thumb]:hover:scale-125 focus:outline-none"
+					/>
+				</div>
+
+				<div
+					class="relative flex items-center justify-between text-[9px] text-gray-500 font-mono font-medium mt-0.5 px-0.5 h-4"
+				>
+					<span class="z-10">60m Ago</span>
+					<transition
+						enter-active-class="transition duration-200 ease-out"
+						enter-from-class="opacity-0 scale-90"
+						enter-to-class="opacity-100 scale-100"
+						leave-active-class="transition duration-150 ease-in"
+						leave-from-class="opacity-100 scale-100"
+						leave-to-class="opacity-0 scale-90"
+					>
+						<div
+							v-if="isReplayMode"
+							class="absolute inset-0 flex items-center justify-center gap-1 text-orange-400/90 font-bold whitespace-nowrap pointer-events-none"
+						>
+							<UIcon
+								name="i-heroicons-bell-slash-20-solid"
+								class="w-2.5 h-2.5"
+							/>
+							<span>리플레이 중 알림 차단</span>
+						</div>
+						<div
+							v-else
+							class="absolute inset-0 flex items-center justify-center text-green-500/40 pointer-events-none"
+						>
+							Real-time Data
+						</div>
+					</transition>
+					<span
+						class="z-10"
+						:class="{ 'text-green-400 font-bold': !isReplayMode }"
+						>Live</span
+					>
+				</div>
+			</div>
+		</transition>
+
+		<transition
+			enter-active-class="transition ease-out duration-200"
+			enter-from-class="opacity-0 -translate-y-2"
+			enter-to-class="opacity-100 translate-y-0"
+			leave-active-class="transition ease-in duration-150"
+			leave-from-class="opacity-100 translate-y-0"
+			leave-to-class="opacity-0 -translate-y-2"
+		>
+			<div
 				v-if="showSettings"
-				class="pointer-events-auto w-full rounded-xl border border-white/10 bg-black/80 p-4 shadow-xl backdrop-blur-md"
+				class="pointer-events-auto w-full rounded-xl border border-white/10 bg-black/80 p-4 shadow-xl backdrop-blur-md z-30"
 			>
 				<div
 					class="flex items-center justify-between mb-3 border-b border-white/10 pb-2"
@@ -256,7 +382,6 @@
 					class="absolute inset-y-0 left-0 w-1"
 					:class="isCancel ? 'bg-gray-500' : 'bg-red-600'"
 				></div>
-
 				<div class="flex items-center gap-3 p-3 pl-4">
 					<div
 						class="flex h-12 w-12 flex-shrink-0 flex-col items-center justify-center rounded-lg shadow-sm"
@@ -275,7 +400,6 @@
 							>{{ displayIntensity }}</span
 						>
 					</div>
-
 					<div class="flex min-w-0 flex-1 flex-col justify-center">
 						<div class="flex items-center gap-2 mb-1">
 							<span
@@ -335,13 +459,9 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from "vue";
-
 // =========================================================================================
-// 1. 상수 정의 (라벨 및 옵션)
+// 1. 상수 정의
 // =========================================================================================
-
-// 상태바 상단에 표시될 짧은 라벨
 const DISPLAY_TYPE_LABELS: Record<string, string> = {
 	jma: "진도",
 	acmap: "PGA",
@@ -355,7 +475,6 @@ const DISPLAY_TYPE_LABELS: Record<string, string> = {
 	rsp4000: "4.0Hz",
 };
 
-// 설정 드롭다운에 표시될 전체 이름
 const TYPE_LABELS: Record<string, string> = {
 	jma: "실시간 진도 (Shindo)",
 	acmap: "최대 가속도 (PGA)",
@@ -369,7 +488,6 @@ const TYPE_LABELS: Record<string, string> = {
 	rsp4000: "4.0Hz 속도 응답",
 };
 
-// 데이터 소스 라벨
 const SOURCE_LABELS: Record<string, string> = {
 	s: "지표 (Surface)",
 	b: "지중 (Borehole)",
@@ -379,40 +497,53 @@ const SOURCE_LABELS: Record<string, string> = {
 // 2. Props & Emits
 // =========================================================================================
 
-const props = defineProps<{
-	eewData: any; // EEW 데이터 객체
-	currentTime: string; // 현재 표시 시간 (문자열)
-	status: string; // 시스템 상태 (live, syncing, error 등)
-	notificationEnabled?: boolean; // 알림 활성화 여부
-	locationActive?: boolean; // 위치 추적 활성화 여부
-	currentType: string; // 현재 시각화 타입
-	currentSource: string; // 현재 데이터 소스
-}>();
+const props = withDefaults(
+	defineProps<{
+		eewData: any;
+		currentTime: string;
+		status: string;
+		notificationEnabled?: boolean;
+		locationActive?: boolean;
+		currentType: string;
+		currentSource: string;
+		replayOffset?: number;
+	}>(),
+	{
+		replayOffset: 0,
+	}
+);
 
 const emit = defineEmits<{
-	(e: "sync"): void; // 수동 동기화 요청
-	(e: "toggle-notification"): void; // 알림 토글 요청
-	(e: "trigger-location"): void; // 위치 찾기 요청
-	(e: "update:currentType", value: string): void; // 타입 변경 (v-model)
-	(e: "update:currentSource", value: string): void; // 소스 변경 (v-model)
+	(e: "sync"): void;
+	(e: "toggle-notification"): void;
+	(e: "trigger-location"): void;
+	(e: "update:currentType", value: string): void;
+	(e: "update:currentSource", value: string): void;
+	(e: "update:replayOffset", value: number): void;
 }>();
 
 // =========================================================================================
 // 3. 상태 변수 (State)
 // =========================================================================================
 
-// 설정 패널 표시 여부
 const showSettings = ref(false);
+const showReplaySettings = ref(false);
 
-const toggleSettings = () => {
+// [수정] 상호 배타적 로직 제거 (동시 열림 허용)
+const toggleSettings = (e?: Event) => {
+	if (e) e.stopPropagation();
 	showSettings.value = !showSettings.value;
 };
 
+const toggleReplaySettings = (e?: Event) => {
+	if (e) e.stopPropagation();
+	showReplaySettings.value = !showReplaySettings.value;
+};
+
 // =========================================================================================
-// 4. V-Model Proxies (양방향 바인딩 처리)
+// 4. V-Model Proxies
 // =========================================================================================
 
-// 상위 컴포넌트의 props를 수정하기 위한 computed get/set
 const proxyType = computed({
 	get: () => props.currentType || "acmap",
 	set: (val) => emit("update:currentType", val),
@@ -423,26 +554,30 @@ const proxySource = computed({
 	set: (val) => emit("update:currentSource", val),
 });
 
+const proxyReplayOffset = computed({
+	get: () => props.replayOffset || 0,
+	set: (val) => emit("update:replayOffset", val),
+});
+
 // =========================================================================================
-// 5. Computed Properties (UI 로직)
+// 5. Computed Properties
 // =========================================================================================
 
-/**
- * 날짜와 시간 텍스트 분리
- * - 모바일 등 좁은 화면에서 날짜를 숨기기 위해 분리해서 반환
- */
+const timelineValue = computed({
+	get: () => 60 - props.replayOffset,
+	set: (val) => emit("update:replayOffset", 60 - val),
+});
+
+const isReplayMode = computed(() => (props.replayOffset || 0) > 0);
+
 const splitTime = computed(() => {
 	if (!props.currentTime) return { date: "", time: "Connecting..." };
 	const parts = props.currentTime.split(" ");
-	// "2025. 12. 31." 부분과 "16:02:33" 부분 분리
 	const date = parts.slice(0, -1).join(" ");
 	const time = parts[parts.length - 1];
 	return { date, time };
 });
 
-/**
- * 현재 설정 상태 요약 텍스트 (예: "PGA · 지표")
- */
 const currentSettingsDisplay = computed(() => {
 	const type = DISPLAY_TYPE_LABELS[props.currentType] || props.currentType;
 	const source = props.currentSource === "s" ? "지표" : "지중";
@@ -453,34 +588,22 @@ const currentSettingsDisplay = computed(() => {
 // 6. Computed Properties (EEW 데이터 파싱)
 // =========================================================================================
 
-/**
- * 응답은 왔지만 실제 지진 데이터가 없는 경우 (빈 메시지 등)
- */
 const isEmptyResponse = computed(() => {
 	if (!props.eewData) return false;
 	const msg = props.eewData.result?.message || "";
 	return msg.includes("データがありません");
 });
 
-/**
- * 취소된 경보(Cancel) 여부
- */
 const isCancel = computed(() => {
 	const val = props.eewData?.is_cancel;
 	return val === "true" || val === true;
 });
 
-/**
- * 최종보(Final) 여부
- */
 const isFinal = computed(() => {
 	const val = props.eewData?.is_final;
 	return val === "true" || val === true;
 });
 
-/**
- * 진도 표시값 (0일 경우 대시(-)로 표시)
- */
 const displayIntensity = computed(() => {
 	const val = props.eewData?.calcintensity;
 	if (!val || val === "0") return "-";
@@ -491,10 +614,6 @@ const displayIntensity = computed(() => {
 // 7. Helper Methods
 // =========================================================================================
 
-/**
- * YYYYMMDDHHmmss 형식을 사람이 읽기 쉬운 포맷으로 변환
- * @returns "YYYY/MM/DD HH:mm:ss"
- */
 const formatOriginTime = (rawTime: string) => {
 	if (!rawTime || rawTime.length < 14) return rawTime;
 	const Y = rawTime.substring(0, 4);
