@@ -1,20 +1,54 @@
 /// <reference lib="webworker" />
 
-// self를 명확하게 Worker 스코프로 선언
+// =========================================================================================
+// 1. 타입 정의 및 환경 설정
+// =========================================================================================
+
+/**
+ * 이 파일은 메인 스레드와 분리된 Web Worker 환경에서 실행됩니다.
+ * 목적: 브라우저 탭 비활성화 시에도 타이머가 멈추지 않고 정확한 주기를 유지하기 위함.
+ */
+
+// Worker 글로벌 스코프(self)에 대한 타입 단언
+// TypeScript가 worker 내부 API(postMessage 등)를 인식하도록 함
 declare const self: DedicatedWorkerGlobalScope;
 
+// =========================================================================================
+// 2. 상태 변수
+// =========================================================================================
+
+// 실행 중인 인터벌 타이머의 ID 저장 (중지 및 중복 방지용)
 let timerId: ReturnType<typeof setInterval> | null = null;
 
+// =========================================================================================
+// 3. 메시지 핸들러 (메인 로직)
+// =========================================================================================
+
+/**
+ * 메인 스레드로부터 메시지를 수신했을 때 실행되는 핸들러
+ * @param e.data "start" 또는 "stop" 명령 문자열
+ */
 self.onmessage = (e: MessageEvent) => {
-    if (e.data === "start") {
-        if (timerId) clearInterval(timerId);
-        timerId = setInterval(() => {
-            self.postMessage("tick");
-        }, 1000);
-    } else if (e.data === "stop") {
-        if (timerId) clearInterval(timerId);
-        timerId = null;
-    }
+	const command = e.data;
+
+	// [명령: 시작] 타이머 루프 시작
+	if (command === "start") {
+		// 이미 돌고 있는 타이머가 있다면 정리 (안전 장치)
+		if (timerId) clearInterval(timerId);
+
+		// 1초(1000ms)마다 메인 스레드로 'tick' 신호 발송
+		timerId = setInterval(() => {
+			self.postMessage("tick");
+		}, 1000);
+	}
+	// [명령: 중지] 타이머 해제
+	else if (command === "stop") {
+		if (timerId) {
+			clearInterval(timerId);
+			timerId = null;
+		}
+	}
 };
 
+// TypeScript 모듈로 인식되도록 빈 export 추가
 export {};
