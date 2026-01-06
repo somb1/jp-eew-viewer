@@ -379,8 +379,20 @@ export const useEEWMap = () => {
 		const lng = parseFloat(eewData.longitude);
 		const depth = parseInt(eewData.depth.replace("km", "")) || 10;
 
-		// 2. 시간 차이 계산 (현재 시각 - 발생 시각)
-		const currTime = new Date(currentDisplayTime);
+		// [수정됨] 2. 시간 차이 계산 (현재 시각 - 발생 시각)
+		// Safari/iOS 호환성을 위해 정규식으로 숫자만 추출하여 Date 생성
+		const timeParts = currentDisplayTime.match(/\d+/g);
+		if (!timeParts || timeParts.length < 6) return;
+
+		const currTime = new Date(
+			parseInt(timeParts[0]!), // Year
+			parseInt(timeParts[1]!) - 1, // Month (0-based)
+			parseInt(timeParts[2]!), // Day
+			parseInt(timeParts[3]!), // Hour
+			parseInt(timeParts[4]!), // Minute
+			parseInt(timeParts[5]!)  // Second
+		);
+
 		const originStr = eewData.origin_time;
 		const originTime = new Date(
 			parseInt(originStr.substring(0, 4)),
@@ -390,6 +402,7 @@ export const useEEWMap = () => {
 			parseInt(originStr.substring(10, 12)),
 			parseInt(originStr.substring(12, 14))
 		);
+		
 		const timeDiff = (currTime.getTime() - originTime.getTime()) / 1000;
 
 		if (timeDiff < 0) return; // 미래 시간 무시

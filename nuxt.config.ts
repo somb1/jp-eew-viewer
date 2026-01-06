@@ -48,4 +48,17 @@ export default defineNuxtConfig({
 			type: "module",
 		},
 	},
+	app: {
+		head: {
+			meta: [
+				// [중요] viewport-fit=cover 추가
+				{
+					name: "viewport",
+					content:
+						"width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover",
+				},
+			],
+			// ... 다른 설정들
+		},
+	},
 });

@@ -1,5 +1,5 @@
 <template>
-	<UHeader title="JP EEW Viewer" mode="drawer">
+	<UHeader title="JP EEW Viewer" :toggle="false">
 		<template #right>
 			<UColorModeSwitch />
 			<UTooltip text="Open on GitHub">
@@ -13,7 +13,5 @@
 				/>
 			</UTooltip>
 		</template>
-
-		<template #body> </template>
 	</UHeader>
 </template>

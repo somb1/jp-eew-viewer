@@ -1,15 +1,17 @@
 <template>
 	<div
-		class="pointer-events-none mb-5 ml-2 flex w-fit max-w-[95vw] flex-col items-start gap-2 font-sans"
+		class="pointer-events-none mb-5 flex w-fit max-w-[calc(100vw-1rem)] flex-col items-start gap-2 font-sans pl-[max(0.5rem,env(safe-area-inset-left))] pr-[env(safe-area-inset-right)]"
 	>
-		<div class="pointer-events-auto w-full relative z-50">
+		<div class="pointer-events-auto w-full relative z-50 touch-none">
 			<div
-				class="flex w-full items-center justify-between gap-3 rounded-full border border-white/10 bg-black/70 px-3 py-2 text-white shadow-lg backdrop-blur-md transition-all hover:bg-black/80"
+				class="flex w-full items-center justify-between gap-2 sm:gap-3 rounded-full border border-white/10 bg-black/70 px-2.5 py-2 sm:px-3 text-white shadow-lg backdrop-blur-md transition-all hover:bg-black/80"
 			>
-				<div class="flex flex-1 items-center gap-2 overflow-hidden">
+				<div
+					class="flex flex-1 items-center gap-1.5 sm:gap-2 overflow-hidden min-w-0"
+				>
 					<button
 						@click="toggleReplaySettings"
-						class="group flex items-center gap-2 font-mono text-xs font-semibold rounded-full px-2 py-1 transition-all outline-none text-left border border-transparent hover:bg-white/10 hover:border-white/5"
+						class="group flex flex-shrink-0 items-center gap-1.5 sm:gap-2 font-mono text-xs font-semibold rounded-full px-1.5 sm:px-2 py-1 transition-all outline-none text-left border border-transparent hover:bg-white/10 hover:border-white/5 active:scale-95"
 						:class="
 							isReplayMode
 								? 'text-orange-300 bg-orange-500/10 border-orange-500/20'
@@ -40,27 +42,24 @@
 						<span
 							class="whitespace-nowrap tracking-wider flex items-center gap-1.5"
 						>
-							<span>
+							<span
+								class="decoration-dashed underline decoration-white/30 underline-offset-4 decoration-2"
+							>
 								<span
 									v-if="splitTime.date"
 									class="hidden sm:inline mr-1 opacity-80"
-									>{{ splitTime.date }}</span
 								>
+									{{ splitTime.date }}
+								</span>
 								<span>{{ splitTime.time }}</span>
 							</span>
 
 							<span
 								v-if="isReplayMode"
-								class="text-[9px] font-bold bg-orange-500/20 px-2 py-0.5 rounded-full text-orange-300"
+								class="text-[9px] font-bold bg-orange-500/20 px-1.5 py-0.5 rounded-full text-orange-300"
 							>
 								-{{ replayOffset }}m
 							</span>
-
-							<UIcon
-								name="i-heroicons-chevron-down-20-solid"
-								class="w-3 h-3 opacity-50 transition-transform group-hover:opacity-100 duration-300"
-								:class="{ 'rotate-180': showReplaySettings }"
-							/>
 						</span>
 					</button>
 
@@ -70,18 +69,21 @@
 
 					<button
 						@click="toggleSettings"
-						class="flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] sm:text-xs font-bold text-yellow-400/90 hover:bg-white/10 hover:text-yellow-300 transition-colors tracking-tight outline-none"
+						class="flex flex-1 min-w-0 items-center gap-1 rounded px-1.5 py-0.5 text-[10px] sm:text-xs font-bold text-yellow-400/90 hover:bg-white/10 hover:text-yellow-300 transition-colors tracking-tight outline-none"
 					>
-						{{ currentSettingsDisplay }}
+						<span class="truncate block">
+							{{ currentSettingsDisplay }}
+						</span>
+
 						<UIcon
 							name="i-heroicons-chevron-down-20-solid"
-							class="h-3 w-3 opacity-70 transition-transform duration-300"
+							class="h-3 w-3 opacity-70 transition-transform duration-300 flex-shrink-0"
 							:class="{ 'rotate-180': showSettings }"
 						/>
 					</button>
 				</div>
 
-				<div class="flex items-center gap-1 flex-shrink-0">
+				<div class="flex items-center gap-0.5 sm:gap-1 flex-shrink-0">
 					<button
 						@click="$emit('trigger-location')"
 						class="group flex h-6 w-6 items-center justify-center rounded-full transition-all duration-300 hover:bg-white/10"
@@ -117,27 +119,49 @@
 						/>
 					</button>
 
-					<div class="h-3 w-px bg-white/20"></div>
+					<div class="h-3 w-px bg-white/20 mx-0.5"></div>
 
 					<button
 						@click="$emit('sync')"
-						:disabled="status === 'syncing'"
-						class="group flex items-center gap-1.5 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-gray-400 transition-colors hover:bg-white/10 hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
+						:disabled="status === 'syncing' && !isReplayMode"
+						class="group flex items-center gap-1.5 rounded-full px-1.5 sm:px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+						:class="[
+							isReplayMode
+								? 'text-orange-400 hover:bg-orange-500/10 hover:text-orange-300'
+								: 'text-gray-400 hover:bg-white/10 hover:text-white',
+						]"
 					>
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							viewBox="0 0 20 20"
-							fill="currentColor"
-							class="h-3 w-3 transition-transform duration-700 group-hover:rotate-180"
-							:class="{ 'animate-spin': status === 'syncing' }"
-						>
-							<path
-								fill-rule="evenodd"
-								d="M15.312 11.424a5.5 5.5 0 01-9.201 2.466l-.312-.311h2.433a.75.75 0 000-1.5H3.989a.75.75 0 00-.75.75v4.242a.75.75 0 001.5 0v-2.43l.31.31a7 7 0 0011.712-3.138.75.75 0 00-1.449-.39zm1.23-3.723a.75.75 0 00.219-.53V2.929a.75.75 0 00-1.5 0v2.433l-.31-.31a7 7 0 00-11.712 3.138.75.75 0 001.449.39 5.5 5.5 0 019.201-2.466l.312.311H12.133a.75.75 0 000 1.5h4.242a.75.75 0 00.53-.219z"
-								clip-rule="evenodd"
+						<template v-if="isReplayMode">
+							<UIcon
+								name="i-heroicons-forward-20-solid"
+								class="h-3 w-3"
 							/>
-						</svg>
-						{{ status === "syncing" ? "Syncing" : "Sync" }}
+							<span>LIVE</span>
+						</template>
+
+						<template v-else>
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								viewBox="0 0 20 20"
+								fill="currentColor"
+								class="h-3 w-3 transition-transform duration-700 group-hover:rotate-180"
+								:class="{
+									'animate-spin': status === 'syncing',
+								}"
+							>
+								<path
+									fill-rule="evenodd"
+									d="M15.312 11.424a5.5 5.5 0 01-9.201 2.466l-.312-.311h2.433a.75.75 0 000-1.5H3.989a.75.75 0 00-.75.75v4.242a.75.75 0 001.5 0v-2.43l.31.31a7 7 0 0011.712-3.138.75.75 0 00-1.449-.39zm1.23-3.723a.75.75 0 00.219-.53V2.929a.75.75 0 00-1.5 0v2.433l-.31-.31a7 7 0 00-11.712 3.138.75.75 0 001.449.39 5.5 5.5 0 019.201-2.466l.312.311H12.133a.75.75 0 000 1.5h4.242a.75.75 0 00.53-.219z"
+									clip-rule="evenodd"
+								/>
+							</svg>
+							<span class="hidden xs:inline">{{
+								status === "syncing" ? "Syncing" : "Sync"
+							}}</span>
+							<span class="xs:hidden">{{
+								status === "syncing" ? "..." : "Sync"
+							}}</span>
+						</template>
 					</button>
 				</div>
 			</div>
@@ -189,21 +213,17 @@
 				</div>
 
 				<div class="relative w-full flex items-center h-4 mb-1">
-					<div
-						class="absolute w-full h-1 bg-gray-700/50 rounded-full overflow-hidden"
-					>
-						<div
-							class="h-full bg-gradient-to-r from-orange-900/50 to-orange-500 transition-all duration-300"
-							:style="{ width: `${(timelineValue / 60) * 100}%` }"
-						></div>
-					</div>
-					<input
-						type="range"
-						v-model.number="timelineValue"
-						min="0"
-						max="60"
-						step="1"
-						class="relative w-full h-4 bg-transparent appearance-none cursor-pointer z-10 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-[3px] [&::-webkit-slider-thumb]:border-orange-500 [&::-webkit-slider-thumb]:shadow-[0_0_8px_rgba(249,115,22,0.8)] [&::-webkit-slider-thumb]:transition-transform [&::-webkit-slider-thumb]:hover:scale-125 focus:outline-none"
+					<USlider
+						v-model="timelineValue"
+						:min="0"
+						:max="60"
+						:step="1"
+						size="xs"
+						:ui="{
+							track: 'bg-gray-700/50 w-full',
+							range: 'bg-gradient-to-r from-orange-900/50 to-orange-500',
+							thumb: 'bg-white ring-2 ring-orange-500 shadow-[0_0_8px_rgba(249,115,22,0.8)] transition-transform hover:scale-110',
+						}"
 					/>
 				</div>
 
@@ -227,7 +247,7 @@
 								name="i-heroicons-bell-slash-20-solid"
 								class="w-2.5 h-2.5"
 							/>
-							<span>리플레이 중 알림 차단</span>
+							<span>알림 차단됨</span>
 						</div>
 						<div
 							v-else
@@ -338,7 +358,9 @@
 			</div>
 		</transition>
 
-		<div class="pointer-events-auto w-full transition-all duration-300">
+		<div
+			class="pointer-events-auto w-full transition-all duration-300 touch-none"
+		>
 			<div
 				v-if="status === 'error'"
 				class="flex items-center justify-center gap-2 rounded-lg border border-red-500/50 bg-red-950/80 p-2.5 text-red-100 backdrop-blur shadow-lg"
@@ -400,6 +422,7 @@
 							>{{ displayIntensity }}</span
 						>
 					</div>
+
 					<div class="flex min-w-0 flex-1 flex-col justify-center">
 						<div class="flex items-center gap-2 mb-1">
 							<span
@@ -459,6 +482,13 @@
 </template>
 
 <script setup lang="ts">
+import { useScrollLock } from "@vueuse/core"; // [추가]
+
+// =========================================================================================
+// [추가 기능] 팝업 활성화 시 스크롤/터치 잠금
+// =========================================================================================
+const isLocked = useScrollLock(document.body);
+
 // =========================================================================================
 // 1. 상수 정의
 // =========================================================================================
@@ -529,7 +559,6 @@ const emit = defineEmits<{
 const showSettings = ref(false);
 const showReplaySettings = ref(false);
 
-// [수정] 상호 배타적 로직 제거 (동시 열림 허용)
 const toggleSettings = (e?: Event) => {
 	if (e) e.stopPropagation();
 	showSettings.value = !showSettings.value;
@@ -624,6 +653,11 @@ const formatOriginTime = (rawTime: string) => {
 	const s = rawTime.substring(12, 14);
 	return `${Y}/${M}/${D} ${h}:${m}:${s}`;
 };
+
+// 설정 창이나 리플레이 창 중 하나라도 열려있으면 스크롤 잠금
+watch([showSettings, showReplaySettings], ([newSettings, newReplay]) => {
+	isLocked.value = newSettings || newReplay;
+});
 </script>
 
 <style scoped>
@@ -634,5 +668,15 @@ const formatOriginTime = (rawTime: string) => {
 }
 .font-mono {
 	font-family: "Roboto Mono", monospace;
+}
+
+/* [수정됨] xs 브레이크포인트 유틸리티 클래스 정의 */
+@media (min-width: 380px) {
+	.xs\:inline {
+		display: inline !important;
+	}
+	.xs\:hidden {
+		display: none !important;
+	}
 }
 </style>
