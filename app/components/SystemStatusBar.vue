@@ -212,25 +212,27 @@
 					</button>
 				</div>
 
-				<div class="relative w-full flex items-center h-4 mb-1">
+				<div class="relative w-full flex items-center h-6 mb-1 px-1">
 					<USlider
 						v-model="timelineValue"
 						:min="0"
 						:max="60"
 						:step="1"
-						size="xs"
+						size="xl"
 						:ui="{
 							track: 'bg-gray-700/50 w-full',
 							range: 'bg-gradient-to-r from-orange-900/50 to-orange-500',
-							thumb: 'bg-white ring-2 ring-orange-500 shadow-[0_0_8px_rgba(249,115,22,0.8)] transition-transform hover:scale-110',
+							/* 2. 썸(핸들)이 커졌으므로 그림자 효과도 살짝 키워주면 좋습니다 */
+							thumb: 'bg-white ring-2 ring-orange-500 shadow-[0_0_10px_rgba(249,115,22,0.8)] transition-transform hover:scale-110',
 						}"
 					/>
 				</div>
 
 				<div
-					class="relative flex items-center justify-between text-[9px] text-gray-500 font-mono font-medium mt-0.5 px-0.5 h-4"
+					class="relative flex items-center justify-between text-xs text-gray-400 font-mono font-medium mt-2 px-1 h-5"
 				>
 					<span class="z-10">60m Ago</span>
+
 					<transition
 						enter-active-class="transition duration-200 ease-out"
 						enter-from-class="opacity-0 scale-90"
@@ -241,11 +243,11 @@
 					>
 						<div
 							v-if="isReplayMode"
-							class="absolute inset-0 flex items-center justify-center gap-1 text-orange-400/90 font-bold whitespace-nowrap pointer-events-none"
+							class="absolute inset-0 flex items-center justify-center gap-1.5 text-orange-400/90 font-bold whitespace-nowrap pointer-events-none"
 						>
 							<UIcon
 								name="i-heroicons-bell-slash-20-solid"
-								class="w-2.5 h-2.5"
+								class="w-3.5 h-3.5"
 							/>
 							<span>알림 차단됨</span>
 						</div>
@@ -256,11 +258,13 @@
 							Real-time Data
 						</div>
 					</transition>
+
 					<span
 						class="z-10"
 						:class="{ 'text-green-400 font-bold': !isReplayMode }"
-						>Live</span
 					>
+						Live
+					</span>
 				</div>
 			</div>
 		</transition>
