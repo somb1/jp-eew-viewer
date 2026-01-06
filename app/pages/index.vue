@@ -38,7 +38,7 @@
 					@trigger-location="handleLocationTrigger"
 					v-model:current-type="monitorType"
 					v-model:current-source="monitorSource"
-					v-model:replay-offset="replayOffsetMinutes"
+					v-model:replay-offset="replayOffsetSeconds"
 					@sync="handleManualSync"
 					@toggle-notification="toggleNotification"
 				/>
@@ -88,7 +88,7 @@ const {
 	monitorSource, // 데이터 소스 (지표/지중) - v-model
 
 	// [리플레이 관련 상태]
-	replayOffsetMinutes,
+	replayOffsetSeconds,
 	isReplayMode, // 워터마크 표시 조건
 
 	handleManualSync, // 수동 동기화 함수

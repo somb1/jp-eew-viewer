@@ -16,11 +16,12 @@ export const useEEWMonitor = () => {
 	// 2. 상태 변수 (Reactive State)
 	// =========================================================================================
 
-	// 리플레이 오프셋 (분 단위, 0 = 실시간)
-	const replayOffsetMinutes = ref(0);
+	// [수정] 리플레이 오프셋 (초 단위, 0 = 실시간)
+    // 기존: const replayOffsetMinutes = ref(0);
+    const replayOffsetSeconds = ref(0);
 
-	// 리플레이 모드인지 판별하는 Computed
-	const isReplayMode = computed(() => replayOffsetMinutes.value > 0);
+    // [수정] 리플레이 모드 판별
+    const isReplayMode = computed(() => replayOffsetSeconds.value > 0);
 
 	// [데이터 상태]
 	const eewData = ref<any>(null);
@@ -259,9 +260,12 @@ export const useEEWMonitor = () => {
 
 			isFetching = true;
 
-			const targetDate = new Date(
-				simulatedTime.getTime() - replayOffsetMinutes.value * 60 * 1000
-			);
+			// [수정] 타겟 시간 계산 로직 변경 (분 -> 초)
+            // 기존: simulatedTime.getTime() - replayOffsetMinutes.value * 60 * 1000
+            const targetDate = new Date(
+                simulatedTime.getTime() - replayOffsetSeconds.value * 1000
+            );
+
 			const timeParam = formatDateToParam(targetDate);
 
 			let responseDate: Date | null = null;
@@ -362,13 +366,12 @@ export const useEEWMonitor = () => {
 		// [수정된 로직 시작]
 		// 강제 동기화(force)가 아니고, 현재 리플레이 모드(offset > 0)인 경우
 		// => 리플레이를 종료하고 실시간(Live) 시점(offset=0)으로 즉시 이동 (서버 fetch 생략)
-		if (!force && replayOffsetMinutes.value > 0) {
-			console.log("Exit Replay Mode -> Jump to Live Stream (No Sync)");
-			replayOffsetMinutes.value = 0;
-			// 0으로 설정하면 다음 워커 Tick에서 targetDate 계산 시 offset이 빠지므로
-			// 즉시 현재 시뮬레이션 시간(Live)을 보여주게 됩니다.
-			return;
-		}
+		// [수정] 리플레이 모드 해제 로직 변경
+        if (!force && replayOffsetSeconds.value > 0) {
+            console.log("Exit Replay Mode -> Jump to Live Stream");
+            replayOffsetSeconds.value = 0; // 0초로 초기화
+            return;
+        }
 		// [수정된 로직 끝]
 
 		if (!force && connectionStatus.value === "syncing") return;
@@ -443,7 +446,7 @@ export const useEEWMonitor = () => {
 		stopEEW,
 		handleManualSync,
 		visibility,
-		replayOffsetMinutes,
+		replayOffsetSeconds, // [수정] 이름 변경하여 반환
 		isReplayMode,
 	};
 };

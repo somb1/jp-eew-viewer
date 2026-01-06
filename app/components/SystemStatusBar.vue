@@ -1,17 +1,17 @@
 <template>
 	<div
-		class="pointer-events-none mb-5 flex w-fit max-w-[calc(100vw-1rem)] flex-col items-start gap-2 font-sans pl-[max(0.5rem,env(safe-area-inset-left))] pr-[env(safe-area-inset-right)]"
+		class="pointer-events-none mb-5 flex w-fit flex-col items-start gap-2 font-sans pl-[max(0.5rem,env(safe-area-inset-left))] pr-[max(0.5rem,env(safe-area-inset-right))] pt-[calc(env(safe-area-inset-top)+0.25rem)] max-w-[calc(100vw-env(safe-area-inset-left)-env(safe-area-inset-right)-1rem)]"
 	>
-		<div class="pointer-events-auto w-full relative z-50 touch-none">
+		<div class="pointer-events-auto w-full relative z-[1000] touch-none">
 			<div
-				class="flex w-full items-center justify-between gap-2 sm:gap-3 rounded-full border border-white/10 bg-black/70 px-2.5 py-2 sm:px-3 text-white shadow-lg backdrop-blur-md transition-all hover:bg-black/80"
+				class="flex w-full items-center justify-between gap-1 rounded-full border border-white/10 bg-black/70 px-1.5 py-1.5 text-white shadow-lg backdrop-blur-md transition-all hover:bg-black/80"
 			>
 				<div
-					class="flex flex-1 items-center gap-1.5 sm:gap-2 overflow-hidden min-w-0"
+					class="flex flex-1 items-center gap-0.5 overflow-hidden min-w-0"
 				>
 					<button
 						@click="toggleReplaySettings"
-						class="group flex flex-shrink-0 items-center gap-1.5 sm:gap-2 font-mono text-xs font-semibold rounded-full px-1.5 sm:px-2 py-1 transition-all outline-none text-left border border-transparent hover:bg-white/10 hover:border-white/5 active:scale-95"
+						class="group flex flex-shrink-0 items-center gap-1.5 font-mono text-xs font-semibold rounded-full px-1.5 min-h-[32px] transition-all outline-none text-left border border-transparent hover:bg-white/10 hover:border-white/5 active:scale-95 touch-manipulation"
 						:class="
 							isReplayMode
 								? 'text-orange-300 bg-orange-500/10 border-orange-500/20'
@@ -55,10 +55,18 @@
 							</span>
 
 							<span
-								v-if="isReplayMode"
-								class="text-[9px] font-bold bg-orange-500/20 px-1.5 py-0.5 rounded-full text-orange-300"
+								class="text-[9px] font-bold py-0.5 rounded-full w-[8ch] text-center inline-flex items-center justify-center tabular-nums whitespace-nowrap transition-colors duration-200"
+								:class="
+									isReplayMode
+										? 'bg-orange-500/20 text-orange-300'
+										: 'bg-green-500/20 text-green-400 opacity-80'
+								"
 							>
-								-{{ replayOffset }}m
+								{{
+									isReplayMode
+										? `-${formatTimeOffset(replayOffset)}`
+										: "LIVE"
+								}}
 							</span>
 						</span>
 					</button>
@@ -69,24 +77,20 @@
 
 					<button
 						@click="toggleSettings"
-						class="flex flex-1 min-w-0 items-center gap-1 rounded px-1.5 py-0.5 text-[10px] sm:text-xs font-bold text-yellow-400/90 hover:bg-white/10 hover:text-yellow-300 transition-colors tracking-tight outline-none"
+						class="flex flex-1 min-w-0 items-center justify-start gap-1 rounded px-1.5 min-h-[32px] text-[11px] sm:text-xs font-bold text-yellow-400 hover:bg-white/10 hover:text-yellow-300 transition-colors tracking-tight outline-none touch-manipulation"
 					>
-						<span class="truncate block">
+						<span
+							class="truncate block decoration-dashed underline decoration-yellow-400/50 underline-offset-2 decoration-2"
+						>
 							{{ currentSettingsDisplay }}
 						</span>
-
-						<UIcon
-							name="i-heroicons-chevron-down-20-solid"
-							class="h-3 w-3 opacity-70 transition-transform duration-300 flex-shrink-0"
-							:class="{ 'rotate-180': showSettings }"
-						/>
 					</button>
 				</div>
 
-				<div class="flex items-center gap-0.5 sm:gap-1 flex-shrink-0">
+				<div class="flex items-center gap-0.5 flex-shrink-0">
 					<button
 						@click="$emit('trigger-location')"
-						class="group flex h-6 w-6 items-center justify-center rounded-full transition-all duration-300 hover:bg-white/10"
+						class="group flex h-7 w-7 items-center justify-center rounded-full transition-all duration-300 hover:bg-white/10 touch-manipulation"
 						:class="[
 							locationActive
 								? 'bg-white/5 text-green-400 shadow-[0_0_10px_rgba(74,222,128,0.2)]'
@@ -96,13 +100,13 @@
 					>
 						<UIcon
 							name="i-heroicons-map-pin-20-solid"
-							class="h-4 w-4 transition-transform group-hover:scale-110"
+							class="h-3.5 w-3.5 transition-transform group-hover:scale-110"
 						/>
 					</button>
 
 					<button
 						@click="$emit('toggle-notification')"
-						class="group flex h-6 w-6 items-center justify-center rounded-full transition-all duration-300 hover:bg-white/10"
+						class="group flex h-7 w-7 items-center justify-center rounded-full transition-all duration-300 hover:bg-white/10 touch-manipulation"
 						:class="[
 							notificationEnabled
 								? 'bg-white/5 text-yellow-400'
@@ -115,16 +119,16 @@
 									? 'i-heroicons-bell-alert-20-solid'
 									: 'i-heroicons-bell-slash-20-solid'
 							"
-							class="h-4 w-4 transition-transform group-hover:scale-110"
+							class="h-3.5 w-3.5 transition-transform group-hover:scale-110"
 						/>
 					</button>
 
-					<div class="h-3 w-px bg-white/20 mx-0.5"></div>
+					<div class="h-2.5 w-px bg-white/20 mx-0.5"></div>
 
 					<button
 						@click="$emit('sync')"
 						:disabled="status === 'syncing' && !isReplayMode"
-						class="group flex items-center gap-1.5 rounded-full px-1.5 sm:px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+						class="group flex items-center gap-1 rounded-full px-1.5 h-7 text-[10px] font-bold uppercase tracking-wider transition-colors disabled:cursor-not-allowed disabled:opacity-50 touch-manipulation"
 						:class="[
 							isReplayMode
 								? 'text-orange-400 hover:bg-orange-500/10 hover:text-orange-300'
@@ -177,7 +181,7 @@
 		>
 			<div
 				v-if="showReplaySettings"
-				class="pointer-events-auto mt-1 w-full rounded-lg border border-orange-500/30 bg-black/90 p-3 shadow-xl backdrop-blur-md z-40"
+				class="pointer-events-auto mt-1 w-full rounded-lg border border-orange-500/30 bg-black/90 p-3 shadow-xl backdrop-blur-md z-[1000]"
 			>
 				<div class="flex items-center justify-between mb-2">
 					<div class="flex items-center gap-2">
@@ -191,19 +195,23 @@
 							Replay
 						</span>
 						<span
-							class="font-mono text-[11px] font-bold px-1.5 py-0.5 rounded bg-white/5"
+							class="font-mono text-[11px] font-bold py-0.5 rounded bg-white/5 w-[76px] text-center inline-block tabular-nums"
 							:class="
 								isReplayMode
 									? 'text-orange-400'
 									: 'text-green-400'
 							"
 						>
-							{{ isReplayMode ? `-${replayOffset}m` : "LIVE" }}
+							{{
+								isReplayMode
+									? `-${formatTimeOffset(replayOffset)}`
+									: "LIVE"
+							}}
 						</span>
 					</div>
 					<button
 						@click="showReplaySettings = false"
-						class="text-gray-500 hover:text-white transition-colors"
+						class="text-gray-500 hover:text-white transition-colors p-1.5 -m-1.5 touch-manipulation"
 					>
 						<UIcon
 							name="i-heroicons-x-mark-20-solid"
@@ -212,20 +220,46 @@
 					</button>
 				</div>
 
-				<div class="relative w-full flex items-center h-6 mb-1 px-1">
-					<USlider
-						v-model="timelineValue"
-						:min="0"
-						:max="60"
-						:step="1"
-						size="xl"
-						:ui="{
-							track: 'bg-gray-700/50 w-full',
-							range: 'bg-gradient-to-r from-orange-900/50 to-orange-500',
-							/* 2. 썸(핸들)이 커졌으므로 그림자 효과도 살짝 키워주면 좋습니다 */
-							thumb: 'bg-white ring-2 ring-orange-500 shadow-[0_0_10px_rgba(249,115,22,0.8)] transition-transform hover:scale-110',
-						}"
-					/>
+				<div
+					class="flex items-center gap-3 mb-1 px-1 w-full touch-none"
+					@touchmove.stop.prevent
+				>
+					<button
+						@click="moveReplay(-10)"
+						class="flex-shrink-0 text-gray-400 hover:text-white hover:bg-white/10 rounded p-1.5 -m-0.5 transition-colors active:scale-95 touch-manipulation"
+						title="-10초 (과거)"
+					>
+						<UIcon
+							name="i-heroicons-backward-20-solid"
+							class="w-5 h-5"
+						/>
+					</button>
+
+					<div class="flex-1 relative h-6 flex items-center">
+						<USlider
+							v-model="timelineValue"
+							:min="0"
+							:max="3600"
+							:step="10"
+							size="xl"
+							:ui="{
+								track: 'bg-gray-700/50 w-full',
+								range: 'bg-gradient-to-r from-orange-900/50 to-orange-500',
+								thumb: 'bg-white ring-2 ring-orange-500 shadow-[0_0_10px_rgba(249,115,22,0.8)] transition-transform hover:scale-110',
+							}"
+						/>
+					</div>
+
+					<button
+						@click="moveReplay(10)"
+						class="flex-shrink-0 text-gray-400 hover:text-white hover:bg-white/10 rounded p-1.5 -m-0.5 transition-colors active:scale-95 touch-manipulation"
+						title="+10초 (미래)"
+					>
+						<UIcon
+							name="i-heroicons-forward-20-solid"
+							class="w-5 h-5"
+						/>
+					</button>
 				</div>
 
 				<div
@@ -279,7 +313,7 @@
 		>
 			<div
 				v-if="showSettings"
-				class="pointer-events-auto w-full rounded-xl border border-white/10 bg-black/80 p-4 shadow-xl backdrop-blur-md z-30"
+				class="pointer-events-auto w-full rounded-xl border border-white/10 bg-black/80 p-4 shadow-xl backdrop-blur-md z-[1000]"
 			>
 				<div
 					class="flex items-center justify-between mb-3 border-b border-white/10 pb-2"
@@ -295,7 +329,7 @@
 					</span>
 					<button
 						@click="showSettings = false"
-						class="text-gray-500 hover:text-white"
+						class="text-gray-500 hover:text-white p-1.5 -m-1.5 touch-manipulation"
 					>
 						<UIcon
 							name="i-heroicons-x-mark-20-solid"
@@ -347,7 +381,7 @@
 								v-for="(label, key) in SOURCE_LABELS"
 								:key="key"
 								@click="proxySource = key"
-								class="flex-1 rounded text-xs sm:text-sm font-medium transition-all"
+								class="flex-1 rounded text-xs sm:text-sm font-medium transition-all touch-manipulation"
 								:class="
 									proxySource === key
 										? 'bg-gray-600 text-white shadow-md'
@@ -363,7 +397,7 @@
 		</transition>
 
 		<div
-			class="pointer-events-auto w-full transition-all duration-300 touch-none"
+			class="pointer-events-auto w-full transition-all duration-300 touch-none relative z-[990]"
 		>
 			<div
 				v-if="status === 'error'"
@@ -408,9 +442,10 @@
 					class="absolute inset-y-0 left-0 w-1"
 					:class="isCancel ? 'bg-gray-500' : 'bg-red-600'"
 				></div>
-				<div class="flex items-center gap-3 p-3 pl-4">
+
+				<div class="flex items-center gap-2.5 p-2 pl-3">
 					<div
-						class="flex h-12 w-12 flex-shrink-0 flex-col items-center justify-center rounded-lg shadow-sm"
+						class="flex h-10 w-10 flex-shrink-0 flex-col items-center justify-center rounded-lg shadow-sm"
 						:class="[
 							isCancel
 								? 'bg-gray-600 text-gray-300'
@@ -418,19 +453,19 @@
 						]"
 					>
 						<span
-							class="text-[0.55rem] font-bold opacity-90 leading-none mb-0.5"
+							class="text-[10px] font-bold opacity-90 leading-none mb-0.5"
 							>진도</span
 						>
 						<span
-							class="font-mono text-2xl font-black leading-none tracking-tighter shadow-black drop-shadow-sm"
+							class="font-mono text-xl font-black leading-none tracking-tighter shadow-black drop-shadow-sm"
 							>{{ displayIntensity }}</span
 						>
 					</div>
 
 					<div class="flex min-w-0 flex-1 flex-col justify-center">
-						<div class="flex items-center gap-2 mb-1">
+						<div class="flex items-center gap-1.5 mb-0.5">
 							<span
-								class="flex-shrink-0 rounded px-1.5 py-0.5 text-[10px] font-bold text-white shadow-sm"
+								class="flex-shrink-0 rounded px-1 py-[1px] text-[9px] font-bold text-white shadow-sm"
 								:class="isCancel ? 'bg-gray-500' : 'bg-red-600'"
 							>
 								{{ isCancel ? "취소" : "속보" }}
@@ -444,19 +479,19 @@
 								>
 							</span>
 							<span
-								class="truncate text-lg font-bold leading-tight text-white drop-shadow-md"
+								class="truncate text-sm sm:text-base font-bold leading-tight text-white drop-shadow-md"
 								>{{ eewData.region_name }}</span
 							>
 						</div>
 						<div
-							class="flex items-center gap-3 text-xs font-medium text-gray-300"
+							class="flex items-center gap-2 text-[11px] sm:text-xs font-medium text-gray-300"
 						>
 							<span class="font-mono text-gray-400">{{
 								formatOriginTime(eewData.origin_time).split(
 									" "
 								)[1]
 							}}</span>
-							<div class="h-3 w-px bg-gray-700"></div>
+							<div class="h-2.5 w-px bg-gray-700"></div>
 							<div class="flex items-baseline gap-1">
 								<span
 									:class="
@@ -470,7 +505,7 @@
 									eewData.magunitude
 								}}</span>
 							</div>
-							<div class="h-3 w-px bg-gray-700"></div>
+							<div class="h-2.5 w-px bg-gray-700"></div>
 							<div class="flex items-baseline gap-1">
 								<span class="text-gray-500">깊이</span>
 								<span class="font-mono font-bold text-white">{{
@@ -486,10 +521,10 @@
 </template>
 
 <script setup lang="ts">
-import { useScrollLock } from "@vueuse/core"; // [추가]
+import { useScrollLock } from "@vueuse/core";
 
 // =========================================================================================
-// [추가 기능] 팝업 활성화 시 스크롤/터치 잠금
+// [기능] 팝업 활성화 시 스크롤/터치 잠금
 // =========================================================================================
 const isLocked = useScrollLock(document.body);
 
@@ -587,19 +622,22 @@ const proxySource = computed({
 	set: (val) => emit("update:currentSource", val),
 });
 
-const proxyReplayOffset = computed({
-	get: () => props.replayOffset || 0,
-	set: (val) => emit("update:replayOffset", val),
-});
-
 // =========================================================================================
-// 5. Computed Properties
+// 5. Computed Properties & Helpers
 // =========================================================================================
 
 const timelineValue = computed({
-	get: () => 60 - props.replayOffset,
-	set: (val) => emit("update:replayOffset", 60 - val),
+	get: () => 3600 - props.replayOffset,
+	set: (val) => emit("update:replayOffset", 3600 - val),
 });
+
+// 버튼 클릭 시 리플레이 이동 로직
+const moveReplay = (deltaSeconds: number) => {
+	let newValue = timelineValue.value + deltaSeconds;
+	if (newValue < 0) newValue = 0;
+	if (newValue > 3600) newValue = 3600;
+	timelineValue.value = newValue;
+};
 
 const isReplayMode = computed(() => (props.replayOffset || 0) > 0);
 
@@ -618,7 +656,7 @@ const currentSettingsDisplay = computed(() => {
 });
 
 // =========================================================================================
-// 6. Computed Properties (EEW 데이터 파싱)
+// 6. EEW Data Parsing
 // =========================================================================================
 
 const isEmptyResponse = computed(() => {
@@ -643,10 +681,6 @@ const displayIntensity = computed(() => {
 	return val;
 });
 
-// =========================================================================================
-// 7. Helper Methods
-// =========================================================================================
-
 const formatOriginTime = (rawTime: string) => {
 	if (!rawTime || rawTime.length < 14) return rawTime;
 	const Y = rawTime.substring(0, 4);
@@ -658,7 +692,15 @@ const formatOriginTime = (rawTime: string) => {
 	return `${Y}/${M}/${D} ${h}:${m}:${s}`;
 };
 
-// 설정 창이나 리플레이 창 중 하나라도 열려있으면 스크롤 잠금
+const formatTimeOffset = (seconds: number) => {
+	if (seconds <= 0) return "LIVE";
+	const m = Math.floor(seconds / 60);
+	const s = seconds % 60;
+
+	if (s > 0) return `${m}m ${s}s`;
+	return `${m}m`;
+};
+
 watch([showSettings, showReplaySettings], ([newSettings, newReplay]) => {
 	isLocked.value = newSettings || newReplay;
 });
@@ -674,7 +716,6 @@ watch([showSettings, showReplaySettings], ([newSettings, newReplay]) => {
 	font-family: "Roboto Mono", monospace;
 }
 
-/* [수정됨] xs 브레이크포인트 유틸리티 클래스 정의 */
 @media (min-width: 380px) {
 	.xs\:inline {
 		display: inline !important;
