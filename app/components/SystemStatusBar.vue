@@ -381,12 +381,15 @@
 								v-for="(label, key) in SOURCE_LABELS"
 								:key="key"
 								@click="proxySource = key"
+								:disabled="key === 'b' && isLongPeriod"
 								class="flex-1 rounded text-xs sm:text-sm font-medium transition-all touch-manipulation"
-								:class="
+								:class="[
 									proxySource === key
 										? 'bg-gray-600 text-white shadow-md'
-										: 'text-gray-400 hover:text-white hover:bg-white/5'
-								"
+										: key === 'b' && isLongPeriod
+										? 'text-gray-600 cursor-not-allowed opacity-50'
+										: 'text-gray-400 hover:text-white hover:bg-white/5',
+								]"
 							>
 								{{ key === "s" ? "지표" : "지중" }}
 							</button>
@@ -522,6 +525,7 @@
 
 <script setup lang="ts">
 import { useScrollLock } from "@vueuse/core";
+import { ref, computed, watch } from "vue";
 
 // =========================================================================================
 // [기능] 팝업 활성화 시 스크롤/터치 잠금
@@ -542,6 +546,15 @@ const DISPLAY_TYPE_LABELS: Record<string, string> = {
 	rsp1000: "1.0Hz",
 	rsp2000: "2.0Hz",
 	rsp4000: "4.0Hz",
+	// [추가] 장주기 지진동계급 (LPGM)
+	abrspmx: "LPGM Max",
+	abrsp1s: "LPGM 1s",
+	abrsp2s: "LPGM 2s",
+	abrsp3s: "LPGM 3s",
+	abrsp4s: "LPGM 4s",
+	abrsp5s: "LPGM 5s",
+	abrsp6s: "LPGM 6s",
+	abrsp7s: "LPGM 7s",
 };
 
 const TYPE_LABELS: Record<string, string> = {
@@ -555,6 +568,15 @@ const TYPE_LABELS: Record<string, string> = {
 	rsp1000: "1.0Hz 속도 응답",
 	rsp2000: "2.0Hz 속도 응답",
 	rsp4000: "4.0Hz 속도 응답",
+	// [추가] 장주기 지진동계급 상세
+	abrspmx: "장주기 지진동계급 (최대)",
+	abrsp1s: "장주기 계급 (주기 1초대)",
+	abrsp2s: "장주기 계급 (주기 2초대)",
+	abrsp3s: "장주기 계급 (주기 3초대)",
+	abrsp4s: "장주기 계급 (주기 4초대)",
+	abrsp5s: "장주기 계급 (주기 5초대)",
+	abrsp6s: "장주기 계급 (주기 6초대)",
+	abrsp7s: "장주기 계급 (주기 7초대)",
 };
 
 const SOURCE_LABELS: Record<string, string> = {
@@ -620,6 +642,26 @@ const proxyType = computed({
 const proxySource = computed({
 	get: () => props.currentSource || "s",
 	set: (val) => emit("update:currentSource", val),
+});
+
+// =========================================================================================
+// [추가] 장주기 지진동계급 모드 감지 및 소스 강제 설정
+// =========================================================================================
+
+/**
+ * 현재 선택된 타입이 장주기 지진동계급(abrsp...)인지 확인
+ */
+const isLongPeriod = computed(() => {
+	return proxyType.value.startsWith("abrsp");
+});
+
+/**
+ * 타입이 변경될 때 감지하여 장주기 모드라면 소스를 '지표(s)'로 고정
+ */
+watch(proxyType, (newType) => {
+	if (newType.startsWith("abrsp") && proxySource.value !== "s") {
+		proxySource.value = "s";
+	}
 });
 
 // =========================================================================================
@@ -692,13 +734,19 @@ const formatOriginTime = (rawTime: string) => {
 	return `${Y}/${M}/${D} ${h}:${m}:${s}`;
 };
 
+/**
+ * 리플레이 오차 시간 포맷터 (수정됨)
+ * - 기존: "20m 30s"
+ * - 변경: "20' 30''"
+ */
 const formatTimeOffset = (seconds: number) => {
 	if (seconds <= 0) return "LIVE";
 	const m = Math.floor(seconds / 60);
 	const s = seconds % 60;
 
-	if (s > 0) return `${m}m ${s}s`;
-	return `${m}m`;
+	// 분(')과 초('') 기호로 변경
+	if (s > 0) return `${m}′${s}″`;
+	return `${m}'`;
 };
 
 watch([showSettings, showReplaySettings], ([newSettings, newReplay]) => {
