@@ -317,6 +317,9 @@ export const useEEWMap = () => {
 			type: "geojson",
 			data: { type: "FeatureCollection", features: [] },
 		});
+
+		// 1. 기존의 원형 배경(circle layer)은 제거하거나 주석 처리합니다.
+		/*
 		map.addLayer({
 			id: "eew-epicenter-marker",
 			type: "circle",
@@ -328,16 +331,26 @@ export const useEEWMap = () => {
 				"circle-stroke-color": "#ffffff",
 			},
 		});
+		*/
+
+		// 2. 텍스트(Symbol) 레이어만 남기고 스타일을 강화합니다.
 		map.addLayer({
 			id: "eew-epicenter-symbol",
 			type: "symbol",
 			source: "eew-epicenter",
 			layout: {
-				"text-field": "✖",
-				"text-size": 14,
-				"text-allow-overlap": true,
+				"text-field": "×", // 유니코드 X 문자 (또는 '✕', 'X' 등 사용 가능)
+				"text-size": 32, // 크기를 키움 (기존 14 -> 24)
+				"text-allow-overlap": true, // 다른 요소와 겹쳐도 항상 표시
+				"text-ignore-placement": true,
+				// 필요하다면 폰트 지정 가능 (기본 설정 따름)
+				// "text-font": ["Noto Sans Bold"],
 			},
-			paint: { "text-color": "#ffffff" },
+			paint: {
+				"text-color": "#ff0000", // 글자색을 빨강으로 변경 (기존 흰색)
+				"text-halo-color": "#ffffff", // 흰색 테두리 추가 (가독성 확보)
+				"text-halo-width": 3, // 테두리 두께
+			},
 		});
 	};
 
@@ -390,7 +403,7 @@ export const useEEWMap = () => {
 			parseInt(timeParts[2]!), // Day
 			parseInt(timeParts[3]!), // Hour
 			parseInt(timeParts[4]!), // Minute
-			parseInt(timeParts[5]!)  // Second
+			parseInt(timeParts[5]!) // Second
 		);
 
 		const originStr = eewData.origin_time;
@@ -402,7 +415,7 @@ export const useEEWMap = () => {
 			parseInt(originStr.substring(10, 12)),
 			parseInt(originStr.substring(12, 14))
 		);
-		
+
 		const timeDiff = (currTime.getTime() - originTime.getTime()) / 1000;
 
 		if (timeDiff < 0) return; // 미래 시간 무시
